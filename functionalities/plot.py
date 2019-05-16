@@ -191,6 +191,30 @@ def plot_diff(model, loader, latent_dim, device='cpu', num_img=1, grid_row_size=
     print("Difference:")
     imshow(torchvision.utils.make_grid(diff_img[:num_img].detach(), grid_row_size), figsize,
            filename + "_difference" if (filename is not None) else None)
+    
+    
+def plot_diff_all(get_model, modelname, num_epoch, loader, latent_dim_lst, device='cpu', num_img=1, grid_row_size=10, figsize=(30, 30), filename=None, conditional=False):
+     """
+    Plot original images, reconstructed images by the INN and the difference between those images for all latent dimensions given in latent_dim_lst.
+
+    :param model: INN use for reconstruction
+    :param loader: loader that wraps the train, test or evaluation set
+    :param latent_dim_lst: list of dimensions of the latent space of which plots should be generated
+    :param num_img: number of images to plot. Default: 1
+    :param grid_row_size: number of images in one row in the grid
+    :param figsize: the size of the generated plot
+    :param filename: file name under which the plot will be saved. (optional)
+    :return: None
+    """
+    for lat_dim in latent_dim_lst:
+        print("Latent Dimension: ", lat_dim)
+        try: 
+            model = fm.load_model('{}_{}_{}'.format(modelname, lat_dim, num_epoch), "{}_bottleneck".format(modelname))
+            plot_diff(model, testloader, lat_dim, device, 100, 10, filename='{}_{}'.format(modelname, lat_dim))
+        except:
+            model = get_model().to(device)
+            model = fm.load_weight(model, '{}_{}_{}'.format(modelname, lat_dim, num_epoch), '{}_bottleneck'.format(modelname))
+            plot_diff(model, testloader, lat_dim, device, 100, 10, filename='com_INN_mnist_{}'.format(lat_dim))
 
 
 def plot_inter(img1, img2, num_steps=10, grid_row_size=10, figsize=(30, 30), filename=None):
