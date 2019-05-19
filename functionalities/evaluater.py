@@ -72,9 +72,9 @@ def get_loss(loader, model, criterion, latent_dim, tracker, conditional=False, d
             output = model(lat_img_mod, rev=True)
 
             if use_label:
-                batch_loss = criterion(inputs, lat_img, output, labels)
+                batch_loss = criterion(inputs, lat_img.to(device), output.to(device), labels)
             else:
-                batch_loss = criterion(inputs, lat_img, output)
+                batch_loss = criterion(inputs, lat_img.to(device), output.to(device))
 
             for i in range(len(batch_loss)):
                 losses[i] += batch_loss[i].item()

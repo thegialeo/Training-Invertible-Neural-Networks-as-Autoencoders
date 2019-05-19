@@ -1,4 +1,8 @@
+import os
 import torch
+from torch import nn
+from torch.autograd import Variable
+from torchvision.utils import save_image
 import numpy as np
 from tqdm import tqdm_notebook as tqdm
 from functionalities import evaluater as ev
@@ -6,6 +10,8 @@ from functionalities import filemanager as fm
 from functionalities import tracker as tk
 from functionalities import MMD_autoencoder_loss as cl
 from functionalities import plot as pl
+from functionalities import loss as lo
+
 
 
 def train(num_epoch, model, modelname, criterion, optimizer, scheduler, latent_dim, trainloader, validloader=None,
@@ -243,7 +249,7 @@ def train_bottleneck(num_epoch, get_model, loss_type, modelname, milestones, lat
                      l2_reg=1e-6, conditional=False, disc_lst=None, use_label=False, device='cpu', save_model=False, 
                      save_variable=True, use_lat_dim=False, num_epoch_save=10, num_img=100, grid_row_size=10):
     """
-    Train model for various latent dimensions to find the suitable bottleneck.
+    Train INN model for various bottleneck sizes.
 
     :param num_epoch: number of training epochs
     :param get_model: function that returns the INN that should be trained
@@ -320,6 +326,71 @@ def train_bottleneck(num_epoch, get_model, loss_type, modelname, milestones, lat
 
     fm.save_variable([tot_train_loss_log, rec_train_loss_log, dist_train_loss_log, spar_train_loss_log,
                       disen_train_loss_log], "bottleneck_train_loss_{}".format(modelname), modelname)
+    
+    
+def train_bottleneck_classic(num_epoch, get_model, modelname, milestones, latent_dim_lst, trainloader,
+                     validloader=None, testloader=None, lr_init=1e-3, device='cpu', mnist=False):    
+    """
+    Train classical model for various bottleneck sizes.
+    """
+    
+    bottleneck_train_log = []
+    bottleneck_test_log = []    
+
+    for bottleneck in latent_dim_lst:
+        print('bottleneck dimension: {}'.format(bottleneck))
+        model = get_model(bottleneck).to(device)
+        model.apply(init_weights)
+        optimizer = torch.optim.Adam(model.parameters(), lr=lr_init, weight_decay=1e-5)
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=0.1)
+
+        train_loss_log = []
+        test_loss_log = []
+
+        for epoch in range(num_epoch):
+            scheduler.step()
+            for data in trainloader:
+                img, _ = data
+                if mnist:
+                    img = img.view(img.size(0), -1)
+                img = Variable(img).cuda()
+                # ===================forward=====================
+                output = model(img)
+                loss = lo.l1_loss(output, img)
+                # ===================backward====================
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+            # ===================log========================
+            train_loss_log.append(loss.data.item())
+            print('epoch [{}/{}], train loss:{:.4f}'.format(epoch + 1, num_epoch, loss.data.item()))
+            #if epoch % 10 == 0 or epoch == (num_epochs - 1):
+             #   pic = to_img(output.cpu().data)
+              #  save_image(pic, './plots/{}/{}_{}_{}.png'.format(modelname, modelname, bottleneck, epoch))
+
+            with torch.no_grad():
+                test_loss = 0
+                for data in testloader:
+                    img, _ = data
+                    if mnist:
+                        img = img.view(img.size(0), -1)
+                    img = Variable(img).cuda()
+                    output = model(img)
+                    test_loss += lo.l1_loss(output, img).data.item()
+
+                test_loss /= len(testloader)
+                test_loss_log.append(test_loss)
+                print('test loss:{:.4f}'.format(test_loss))
+
+        bottleneck_train_log.append(train_loss_log[-1])
+        bottleneck_test_log.append(test_loss_log[-1])
+
+        fm.save_model(model, '{}_{}'.format(modelname, bottleneck))
+        fm.save_weight(model, '{}_{}'.format(modelname, bottleneck))
+        fm.save_variable([train_loss_log, test_loss_log], "{}_{}".format(modelname, bottleneck))
+
+    fm.save_variable([bottleneck_train_log, bottleneck_test_log], "{}_bottleneck".format(modelname))
+    
 
 def init_model(get_model, latent_dim, loss_type, device, a_distr=1, a_rec=1, a_spar=1, a_disen=1, a_disc=0, conditional=False, disc_lst=None, use_lat_dim=False, cont_min=None, cont_max=None, num_iter=None, init_weight=True):
     """
@@ -387,6 +458,9 @@ def init_training(model_params, lr_init, l2_reg, milestones):
 
 
 def init_param(mod, sigma = 0.1):
+    """
+    Weight intialization for INN models.
+    """
     for key, param in mod.named_parameters():
         split = key.split('.')
         if param.requires_grad:
@@ -395,4 +469,10 @@ def init_param(mod, sigma = 0.1):
                 param.data.fill_(0.)
 
 
-
+def init_weights(m):
+    """
+    Weight intialization for classical models.
+    """
+    if type(m) == nn.Linear:
+        torch.nn.init.xavier_uniform(m.weight)
+        m.bias.data.fill_(0.01)

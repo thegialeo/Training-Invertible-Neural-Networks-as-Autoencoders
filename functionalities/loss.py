@@ -14,7 +14,8 @@ def feat_loss(x, y, feat_model):
     return torch.mean(torch.abs(feat_model(x) - feat_model(y)))
 
 
-def MMD_multiscale(x, y):
+def MMD_multiscale(x, y, device):
+    x, y = x.to(device), y.to(device)
     xx, yy, zz = torch.mm(x,x.t()), torch.mm(y,y.t()), torch.mm(x,y.t())
 
     rx = (xx.diag().unsqueeze(0).expand_as(xx))
@@ -35,33 +36,10 @@ def MMD_multiscale(x, y):
 
     return torch.mean(XX + YY - 2.*XY)
 
-
-def MMD_gram(x,y):
-    # taken from Carsten
-    kxx = x.mm(x.t())
-    kyy = y.mm(y.t())
-    kxy = x.mm(y.t())
-
-    rx = (kxx.diag().unsqueeze(0).expand_as(kxx))
-    ry = (kyy.diag().unsqueeze(0).expand_as(kyy))
-
-    XX, YY, XY = x.new_zeros(kxx.shape), x.new_zeros(kxx.shape), x.new_zeros(kxx.shape)
-
-    l2xx = torch.clamp(rx.t() + rx - 2.*kxx, 0, np.inf)
-    l2yy = torch.clamp(ry.t() + ry - 2.*kyy, 0, np.inf)
-    l2xy = torch.clamp(rx.t() + ry - 2.*kxy, 0, np.inf)
-
-    for a in [0.1, 0.5, 1., 2., 5.]:
-        XX += (1. + 0.5 * l2xx / a)**-a
-        YY += (1. + 0.5 * l2yy / a)**-a
-        XY += (1. + 0.5 * l2xy / a)**-a
-
-    return torch.mean(XX + YY - 2.*XY)
-
 def shuffle(x):
-    x = x.permute(1, 0)
+    x = x.permute(1, 0).cpu()
     shape = x.size()
-    rand_x = torch.cuda.FloatTensor()
+    rand_x = torch.FloatTensor()
     for i in range(x.size()[0]):
         idx = torch.randperm(x.size()[1])
         temp = x[i, idx]

@@ -51,7 +51,7 @@ class MMD_autoencoder_loss(nn.Module):
             print('loss not found')
 
 
-        l_disen = self.a_disen * loss.MMD_gram(v[:, :self.latent_dim], loss.shuffle(v[:, :self.latent_dim]))
+        l_disen = self.a_disen * loss.MMD_multiscale(v[:, :self.latent_dim], loss.shuffle(v[:, :self.latent_dim].to(self.device)), self.device)
 
         if target is not None and self.conditional:
             y = v.new_empty((v.size(0), self.latent_dim)).normal_()
@@ -61,36 +61,36 @@ class MMD_autoencoder_loss(nn.Module):
                 count = temp.size(0)
                 if count == 0:
                     next
-                v_array.append(self.a_distr * loss.MMD_gram(temp, y[:count]))
+                v_array.append(self.a_distr * loss.MMD_multiscale(temp, y[:count], self.device))
             l_distr = torch.stack(v_array).mean()
-            #l_distr = self.a_distr * loss.MMD_gram(v[:, :self.latent_dim], y)
+            #l_distr = self.a_distr * loss.MMD_multiscale(v[:, :self.latent_dim], y, self.device)
             l_sparse = self.a_spar * torch.mean(v[:, self.latent_dim+10:] ** 2)
             l_disc = self.a_disc * loss.l2_loss(v[:, self.latent_dim : self.latent_dim+10], target)
-            l = l_rec + l_distr + l_sparse + l_disen + l_disc
+            l = l_rec.to(self.device) + l_distr.to(self.device) + l_sparse.to(self.device) + l_disen.to(self.device) + l_disc.to(self.device)
             return [l, l_rec, l_distr, l_sparse, l_disen, l_disc]
         elif label is not None and self.disc_lst is not None:
             y = v.new_empty((v.size(0), self.latent_dim - 1)).normal_()
-            l_distr = self.a_distr * loss.MMD_gram(v[:, 1:self.latent_dim], y)
+            l_distr = self.a_distr * loss.MMD_multiscale(v[:, 1:self.latent_dim], y, self.device)
             l_sparse = self.a_spar * torch.mean(v[:, self.latent_dim:] ** 2)
             l_disc = self.a_disc * loss.l2_loss(v[:, :1], self.disc_lst[label].float())
-            l = l_rec + l_distr + l_sparse + l_disen + l_disc
+            l = l_rec.to(self.device) + l_distr.to(self.device) + l_sparse.to(self.device) + l_disen.to(self.device) + l_disc.to(self.device)
             return [l, l_rec, l_distr, l_sparse, l_disen, l_disc]
         elif self.disc_lst is not None:
             y = v.new_empty((v.size(0), self.latent_dim - 1)).normal_()
-            l_distr = self.a_distr * loss.MMD_gram(v[:, 1:self.latent_dim], y)
+            l_distr = self.a_distr * loss.MMD_multiscale(v[:, 1:self.latent_dim], y, self.device)
             l_sparse = self.a_spar * torch.mean(v[:, self.latent_dim:] ** 2)
             l_disc = self.a_disc * torch.mean(torch.min(torch.abs(v[:, :1] - self.disc_lst), 1)[0])
-            l = l_rec + l_distr + l_sparse + l_disen + l_disc
+            l = l_rec.to(self.device) + l_distr.to(self.device) + l_sparse.to(self.device) + l_disen.to(self.device) + l_disc.to(self.device) 
             return [l, l_rec, l_distr, l_sparse, l_disen, l_disc]
         else:
             y = v.new_empty((v.size(0), self.latent_dim)).normal_()
             if self.cont_min is not None and self.cont_max is not None and self.num_iter is not None:
                 cont_capacity = (self.cont_max - self.cont_min) * self.num_step / float(self.num_iter) + self.cont_min
                 cont_capacity = min(cont_capacity, self.cont_max)
-                l_distr = loss.MMD_gram(v[:, :self.latent_dim], y)
+                l_distr = loss.MMD_multiscale(v[:, :self.latent_dim], y, self.device)
                 l_distr = self.a_distr * torch.abs(l_distr - cont_capacity)
             else:
-                l_distr = self.a_distr * loss.MMD_gram(v[:, :self.latent_dim], y)
+                l_distr = self.a_distr * loss.MMD_multiscale(v[:, :self.latent_dim], y, self.device)
             l_sparse = self.a_spar * torch.mean(v[:, self.latent_dim:] ** 2)
-            l = l_rec + l_distr + l_sparse + l_disen
+            l = l_rec.to(self.device) + l_distr.to(self.device) + l_sparse.to(self.device) + l_disen.to(self.device)
             return [l, l_rec, l_distr, l_sparse, l_disen]

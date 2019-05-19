@@ -5,6 +5,8 @@ import torch
 import torchvision
 from functionalities import traverser as tra
 from functionalities import dataloader as dl
+from functionalities import filemanager as fm
+
 
 def plot(x, y, x_label, y_label, plot_label, title, filename, sub_dim=None, figsize=(15, 10), font_size=24, y_log_scale=False):
     """
@@ -194,7 +196,7 @@ def plot_diff(model, loader, latent_dim, device='cpu', num_img=1, grid_row_size=
     
     
 def plot_diff_all(get_model, modelname, num_epoch, loader, latent_dim_lst, device='cpu', num_img=1, grid_row_size=10, figsize=(30, 30), filename=None, conditional=False):
-     """
+    """
     Plot original images, reconstructed images by the INN and the difference between those images for all latent dimensions given in latent_dim_lst.
 
     :param model: INN use for reconstruction
@@ -210,11 +212,11 @@ def plot_diff_all(get_model, modelname, num_epoch, loader, latent_dim_lst, devic
         print("Latent Dimension: ", lat_dim)
         try: 
             model = fm.load_model('{}_{}_{}'.format(modelname, lat_dim, num_epoch), "{}_bottleneck".format(modelname))
-            plot_diff(model, testloader, lat_dim, device, 100, 10, filename='{}_{}'.format(modelname, lat_dim))
+            plot_diff(model, loader, lat_dim, device, num_img, grid_row_size, filename='{}_{}'.format(modelname, lat_dim))
         except:
             model = get_model().to(device)
             model = fm.load_weight(model, '{}_{}_{}'.format(modelname, lat_dim, num_epoch), '{}_bottleneck'.format(modelname))
-            plot_diff(model, testloader, lat_dim, device, 100, 10, filename='com_INN_mnist_{}'.format(lat_dim))
+            plot_diff(model, loader, lat_dim, device, num_img, grid_row_size, filename='com_INN_mnist_{}'.format(lat_dim))
 
 
 def plot_inter(img1, img2, num_steps=10, grid_row_size=10, figsize=(30, 30), filename=None):
@@ -464,7 +466,11 @@ def plot_all_traversals(model, latent_dim, input_size, input_shape, num_sample=8
 
     #imshow(torchvision.utils.make_grid(generate.detach(), num_sample), figsize, filename if (filename is not None) else None)
 
-
+def to_img(x, size):
+    #x = 0.5 * (x + 1)
+    x = x.clamp(0, 1)
+    x = x.view(x.size(0), size[0], size[1], size[2])
+    return x
 
 
 
