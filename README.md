@@ -3,7 +3,7 @@ This code accompanies the paper
 ### Training Invertible Neural Networks as Autoencoders
 
 TG. L. Nguyen et al,
-GCPR 2019 young researcher forum.
+GCPR 2019.
 
 ---
 
