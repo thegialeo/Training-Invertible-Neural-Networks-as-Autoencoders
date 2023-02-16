@@ -5,7 +5,7 @@ repos:
   - repo: local
     hooks:
       - id: pyupgrade
-        name: pyupgrade 
+        name: pyupgrade
         stages: [commit]
         language: system
         entry: poetry run pyupgrade --py39-plus
@@ -33,6 +33,27 @@ repos:
         types: [python]
         exclude: setup.py
 
+      - id: darglint
+        name: darglint
+        stages: [commit]
+        language: system
+        entry: poetry run darglint src
+        types: [python]
+
+      - id: pydocstyle
+        name: pydocstyle
+        stages: [commit]
+        language: system
+        entry: poetry run pydocstyle src
+        types: [python]
+
+      - id: pylint
+        name: pylint
+        stages: [commit]
+        language: system
+        entry: poetry run pylint src
+        types: [python]
+
       - id: mypy
         name: mypy
         stages: [commit]
@@ -45,14 +66,21 @@ repos:
         name: pytest
         stages: [commit]
         language: system
-        entry: poetry run pytest
+        entry: poetry run pytest tests
         types: [python]
         pass_filenames: false
+
+      - id: bandit
+        name: bandit
+        stages: [commit]
+        language: system
+        entry: poetry run bandit -r src
+        types: [python]
 
       - id: pytest-cov
         name: pytest
         stages: [push]
         language: system
-        entry: pipenv run pytest --cov --cov-fail-under=100
+        entry: pipenv run pytest tests --cov=src --cov-report=html --cov-fail-under=100
         types: [python]
         pass_filenames: false
