@@ -58,9 +58,8 @@ repos:
         name: mypy
         stages: [commit]
         language: system
-        entry: poetry run mypy
+        entry: poetry run mypy src
         types: [python]
-        pass_filenames: false
 
       - id: pytest
         name: pytest
@@ -68,7 +67,6 @@ repos:
         language: system
         entry: poetry run pytest tests
         types: [python]
-        pass_filenames: false
 
       - id: bandit
         name: bandit
@@ -77,10 +75,16 @@ repos:
         entry: poetry run bandit -r src
         types: [python]
 
+      - id: safety
+        name: safety
+        stages: [commit]
+        language: system
+        entry: poetry run safety check
+        pass_filenames: false
+
       - id: pytest-cov
         name: pytest
         stages: [push]
         language: system
         entry: pipenv run pytest tests --cov=src --cov-report=html --cov-fail-under=100
         types: [python]
-        pass_filenames: false
