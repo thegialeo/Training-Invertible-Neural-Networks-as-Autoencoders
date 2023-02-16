@@ -1,7 +1,7 @@
 import torch
 
+
 class tracker():
-    # from Carsten
     # tracker for mean and standard deviation of latent space
     def __init__(self, dim):
         self.mu     = 0
