@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "training_invertible_neural_networks_as_autoencoders"
+version = "0.1.0"
+description = ""
+authors = ["Xenovortex <Leo.Nguyen@gmx.de>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pyupgrade = "^3.3.1"
+
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+mypy = "^1.0.0"
+pytest = "^7.2.1"
+pytest-cov = "^4.0.0"
+darglint = "^1.8.1"
+bandit = "^1.7.4"
+safety = "^2.3.5"
+black = "23.1a1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
