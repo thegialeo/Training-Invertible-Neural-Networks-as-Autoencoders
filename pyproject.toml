@@ -8,6 +8,8 @@ packages = [{include = "FrEIA"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+torch = "^1.13.1"
+torchvision = "^0.14.1"
 
 
 [tool.poetry.group.dev.dependencies]
