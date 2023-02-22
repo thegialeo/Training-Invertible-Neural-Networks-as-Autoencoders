@@ -1,6 +1,8 @@
 default_language_version:
   python: python3.9
 
+files: src/
+
 repos:
   - repo: local
     hooks:
@@ -60,6 +62,7 @@ repos:
         language: system
         entry: poetry run mypy src
         types: [python]
+        pass_filenames: false
 
       - id: pytest
         name: pytest

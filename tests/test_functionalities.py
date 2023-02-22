@@ -1,6 +1,7 @@
 import torch
+import torchvision.models as models
 
-from src.functionalities import get_device
+from src.functionalities import count_param, get_device
 
 
 def test_get_device():
@@ -14,3 +15,12 @@ def test_get_device():
         cpu_device = get_device()
         assert isinstance(cpu_device, str)
         assert cpu_device == "cpu"
+
+
+def test_count_param():
+    # https://pytorch.org/vision/main/models/generated/torchvision.models.alexnet.html
+    # Number of parameters: 61100840
+    alexnet = models.alexnet()
+    num_params = count_param(alexnet)
+    assert isinstance(num_params, int)
+    assert num_params == 61100840
