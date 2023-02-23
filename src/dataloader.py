@@ -4,7 +4,9 @@ Functions:
     load_mnist() -> tuple[datasets.MNIST, datasets.MNIST]: load MNIST dataset
     load_cifar() -> tuple[datasets.CIFAR10, datasets.CIFAR10]: load CIFAR10 dataset
     load_celeba() -> tuple[datasets.CelebA, datasets.CelebA]: load CelebA dataset
+    get_loader(datasets, int, bool) -> torch.DataLoader: get torch dataloader from dataset
 """
+import torch
 from torchvision import datasets, transforms
 
 
@@ -67,5 +69,20 @@ def load_celeba() -> tuple[datasets.CelebA, datasets.CelebA]:
     return trainset, testset
 
 
-if __name__ == "__main__":
-    load_celeba()
+def get_loader(
+    dataset: datasets, batch_size: int, shuffle: bool
+) -> torch.utils.data.DataLoader:
+    """Get torch dataloader from dataset.
+
+    Args:
+        dataset (datasets): dataset
+        batch_size (int): batch size
+        shuffle (bool): shuffle dataset each epoch
+
+    Returns:
+        loader (torch.utils.data.DataLoader): data loader
+    """
+    loader = torch.utils.data.DataLoader(
+        dataset, batch_size=batch_size, shuffle=shuffle, pin_memory=True, drop_last=True
+    )
+    return loader
