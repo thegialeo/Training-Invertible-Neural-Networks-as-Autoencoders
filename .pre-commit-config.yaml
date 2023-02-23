@@ -94,5 +94,5 @@ repos:
         name: pytest
         stages: [push]
         language: system
-        entry: pipenv run pytest tests/ --cov=src --cov-report=html --cov-fail-under=100
+        entry: poetry run pytest tests/ --cov=src --cov-report=html --cov-fail-under=100
         types: [python]
