@@ -3,6 +3,7 @@
 Functions:
     l1_loss(torch.Tensor, torch.Tensor, torch.dtype) -> torch.Tensor: L1 norm loss function
     l2_loss(torch.Tensor, torch.Tensor, torch.dtype) -> torch.Tensor: L2 norm loss function
+    mmd_multiscale(torch.Tensor, torch.Tensor, torch.dtype, str) -> torch.Tensor: MMD loss function
 """
 
 from typing import Optional

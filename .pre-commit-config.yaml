@@ -1,8 +1,6 @@
 default_language_version:
   python: python3.9
 
-files: src/
-
 repos:
   - repo: local
     hooks:
@@ -12,71 +10,78 @@ repos:
         language: system
         entry: poetry run pyupgrade --py39-plus
         types: [python]
+        files: src/
 
       - id: isort
         name: isort
         stages: [commit]
         language: system
-        entry: poetry run isort src
+        entry: poetry run isort
         types: [python]
+        files: src/
 
       - id: black
         name: black
         stages: [commit]
         language: system
-        entry: poetry run black src
+        entry: poetry run black
         types: [python]
+        files: src/
 
       - id: flake8
         name: flake8
         stages: [commit]
         language: system
-        entry: poetry run flake8 src
+        entry: poetry run flake8
         types: [python]
-        exclude: setup.py
+        files: src/
 
       - id: darglint
         name: darglint
         stages: [commit]
         language: system
-        entry: poetry run darglint src
+        entry: poetry run darglint
         types: [python]
+        files: src/
 
       - id: pydocstyle
         name: pydocstyle
         stages: [commit]
         language: system
-        entry: poetry run pydocstyle src
+        entry: poetry run pydocstyle
         types: [python]
+        files: src/
 
       - id: pylint
         name: pylint
         stages: [commit]
         language: system
-        entry: poetry run pylint src
+        entry: poetry run pylint
         types: [python]
+        files: src/
 
       - id: mypy
         name: mypy
         stages: [commit]
         language: system
-        entry: poetry run mypy src
+        entry: poetry run mypy
         types: [python]
-        pass_filenames: false
+        files: src/
 
       - id: pytest
         name: pytest
         stages: [commit]
         language: system
-        entry: poetry run pytest tests
+        entry: poetry run pytest tests/
         types: [python]
 
       - id: bandit
         name: bandit
         stages: [commit]
         language: system
-        entry: poetry run bandit -r src
+        entry: poetry run bandit
         types: [python]
+        files: src/
 
       - id: safety
         name: safety
@@ -89,5 +94,5 @@ repos:
         name: pytest
         stages: [push]
         language: system
-        entry: pipenv run pytest tests --cov=src --cov-report=html --cov-fail-under=100
+        entry: pipenv run pytest tests/ --cov=src --cov-report=html --cov-fail-under=100
         types: [python]
