@@ -83,6 +83,7 @@ def test_get_loader(load_dataset):
     assert train_data_batch.size() == (32,) + train_data.size()
     if isinstance(train_label, torch.Tensor):
         assert train_label_batch.size() == (32,) + train_label.size()
+        assert train_label.size() == (40,)
     elif isinstance(train_label, int):
         assert train_label_batch.size() == (32,)
     else:
@@ -94,6 +95,7 @@ def test_get_loader(load_dataset):
     assert test_data_batch.size() == (32,) + test_data.size()
     if isinstance(test_label, torch.Tensor):
         assert test_label_batch.size() == (32,) + test_label.size()
+        assert test_label.size() == (40,)
     elif isinstance(test_label, int):
         assert test_label_batch.size() == (32,)
     else:
