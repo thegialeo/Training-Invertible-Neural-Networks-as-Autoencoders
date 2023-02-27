@@ -1,16 +1,23 @@
+import pytest
 import torch
 
-from src.architecture import MNISTAutoencoder
+from src.architecture import (
+    MNISTAutoencoder,
+    MNISTAutoencoder1024,
+    MNISTAutoencoder2048,
+    MNISTAutoencoderDeep1024,
+)
 from src.dataloader import get_loader, load_mnist
 
 
-def test_MNISTAutoencoder():
+@pytest.mark.parametrize("autoencoder", [MNISTAutoencoder, MNISTAutoencoder1024, MNISTAutoencoderDeep1024, MNISTAutoencoder2048])
+def test_MNISTAutoencoder(autoencoder):
     trainset, testset = load_mnist()
     trainloader = get_loader(trainset, 2, True)
     testloader = get_loader(testset, 2, False)
     train_data_batch, _ = next(iter(trainloader))
     test_data_batch, _ = next(iter(testloader))
-    model = MNISTAutoencoder(12)
+    model = autoencoder(12)
     out_train = model(train_data_batch)
     out_test = model(test_data_batch)
     assert isinstance(train_data_batch, torch.Tensor)
