@@ -1,10 +1,14 @@
 """Classical and INN Autoencoder architectures.
 
+Functions:
+    get_mnist_inn_autoencoder (None): Returns the MNIST INN autoencoder architecture.
+
 Classes:
     MNISTAutoencoder: Classical Autoencoder architecture for MNIST.
     MNISTAutoencoder1024: MNIST Classical Autoencoder (increase hidden size 1024).
     MNISTAutoencoderDeep1024: MNIST Classical Autoencoder (hidden size 1024 + more layers).
     MNISTAutoencoder2048: MNIST Classical Autoencoder (increase hidden size 2048).
+    CIFAR10Autoencoder: Classical Autoencoder architecture for CIFAR10.
 """
 
 import torch
@@ -242,7 +246,7 @@ class MNISTAutoencoder2048(nn.Module):
 
 
 def get_mnist_inn_autoencoder() -> ReversibleGraphNet:
-    """Get the MNIST INN autoencoder architecture.
+    """Return the MNIST INN autoencoder architecture.
 
     Returns:
         coder (ReversibleGraphNet): MNIST INN autoencoder architecture.
@@ -314,3 +318,81 @@ def get_mnist_inn_autoencoder() -> ReversibleGraphNet:
     coder = fr.ReversibleGraphNet(nodes, 0, 1)
 
     return coder
+
+
+# ---------------------------------------------------------------------------- #
+#                            CIFAR 10 architectures                            #
+# ---------------------------------------------------------------------------- #
+
+
+class CIFAR10Autoencoder(nn.Module):
+    """Classical Autoencoder architecture for CIFAR10 dataset.
+
+    Attributes:
+        encoder (nn.Module): Encoder network.
+        bottleneck (nn.Module): Bottleneck fully-connected layer.
+        decoder (nn.Module): Decoder network.
+
+    Methods:
+        forward (torch.Tensor): Forward pass of the network.
+    """
+
+    def __init__(self, bottleneck: int) -> None:
+        """Initialize the CIFAR10 autoencoder architecture.
+
+        Args:
+            bottleneck (int): Size of bottleneck layer.
+        """
+        super().__init__()
+
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=0),
+            nn.ReLU(True),
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=0),
+            nn.ReLU(True),
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+            nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=0),
+            nn.ReLU(True),
+            nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=0),
+            nn.ReLU(True),
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+            nn.Conv2d(512, 1024, kernel_size=3, stride=1, padding=0),
+            nn.ReLU(True),
+        )
+
+        self.bottleneck = nn.Sequential(
+            nn.Linear(1024 * 3 * 3, bottleneck),
+            nn.Linear(bottleneck, 1024 * 3 * 3),
+            nn.ReLU(True),
+        )
+
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(1024, 512, kernel_size=3, stride=1, padding=0),
+            nn.ReLU(True),
+            nn.Upsample(scale_factor=2),
+            nn.ConvTranspose2d(512, 256, kernel_size=3, stride=1, padding=0),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(256, 128, kernel_size=3, stride=1, padding=0),
+            nn.ReLU(True),
+            nn.Upsample(scale_factor=2),
+            nn.ConvTranspose2d(128, 64, kernel_size=3, stride=1, padding=0),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(64, 3, kernel_size=3, stride=1, padding=0),
+            nn.Tanh(),
+        )
+
+    def forward(self, inp: torch.Tensor) -> torch.Tensor:
+        """Forward pass.
+
+        Args:
+            inp (torch.Tensor): Input tensor.
+
+        Returns:
+            out (torch.Tensor): Output tensor.
+        """
+        lat = self.encoder(inp)
+        lat_flat = lat.view(-1, 1024 * 3 * 3)
+        lat_flat = self.bottleneck(lat_flat)
+        lat = lat.view(-1, 1024, 3, 3)
+        out = self.decoder(lat)
+        return out
