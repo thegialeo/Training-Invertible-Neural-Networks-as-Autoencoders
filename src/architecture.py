@@ -10,6 +10,7 @@ Classes:
     MNISTAutoencoderDeep1024: MNIST Classical Autoencoder (hidden size 1024 + more layers).
     MNISTAutoencoder2048: MNIST Classical Autoencoder (increase hidden size 2048).
     CIFAR10Autoencoder: Classical Autoencoder architecture for CIFAR10.
+    CelebAAutoencoder: Classical Autoencoder architecture for CelebA.
 """
 
 import torch
@@ -348,16 +349,23 @@ class CIFAR10Autoencoder(nn.Module):
 
         self.encoder = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=0),
+            # output: (64, 30, 30)
             nn.ReLU(True),
             nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=0),
+            # output: (128, 28, 28)
             nn.ReLU(True),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+            # output: (128, 14, 14)
             nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=0),
+            # output: (256, 12, 12)
             nn.ReLU(True),
             nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=0),
+            # output: (512, 10, 10)
             nn.ReLU(True),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+            # output: (512, 5, 5)
             nn.Conv2d(512, 1024, kernel_size=3, stride=1, padding=0),
+            # output: (1024, 3, 3)
             nn.ReLU(True),
         )
 
@@ -369,16 +377,23 @@ class CIFAR10Autoencoder(nn.Module):
 
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(1024, 512, kernel_size=3, stride=1, padding=0),
+            # output: (512, 5, 5)
             nn.ReLU(True),
             nn.Upsample(scale_factor=2),
+            # output: (512, 10, 10)
             nn.ConvTranspose2d(512, 256, kernel_size=3, stride=1, padding=0),
+            # output: (256, 12, 12)
             nn.ReLU(True),
             nn.ConvTranspose2d(256, 128, kernel_size=3, stride=1, padding=0),
+            # output: (128, 14, 14)
             nn.ReLU(True),
             nn.Upsample(scale_factor=2),
+            # output: (128, 28, 28)
             nn.ConvTranspose2d(128, 64, kernel_size=3, stride=1, padding=0),
+            # output: (64, 30, 30)
             nn.ReLU(True),
             nn.ConvTranspose2d(64, 3, kernel_size=3, stride=1, padding=0),
+            # output: (3, 32, 32)
             nn.Tanh(),
         )
 
@@ -476,3 +491,87 @@ def get_cifar10_inn_autoencoder() -> ReversibleGraphNet:
     coder = fr.ReversibleGraphNet(nodes, 0, 1)
 
     return coder
+
+
+# ---------------------------------------------------------------------------- #
+#                             CelebA architectures                             #
+# ---------------------------------------------------------------------------- #
+
+
+class CelebAAutoencoder(nn.Module):
+    """Classical Autoencoder architecture for CelebA dataset.
+
+    Attributes:
+        encoder (nn.Module): Encoder network.
+        bottleneck (nn.Module): Bottleneck fully-connected layer.
+        decoder (nn.Module): Decoder network.
+
+    Methods:
+        foward (torch.Tensor): Forward pass of the network.
+    """
+
+    def __init__(self, bottleneck: int) -> None:
+        """Initialize the CelebA autoencoder architecture.
+
+        Args:
+            bottleneck (int): Size of bottleneck layer.
+        """
+        super().__init__()
+
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 128, kernel_size=4, stride=2, padding=0),
+            # output: (128, 108, 88)
+            nn.ReLU(True),
+            nn.Conv2d(128, 256, kernel_size=4, stride=2, padding=1),
+            # output: (256, 54, 44)
+            nn.ReLU(True),
+            nn.Conv2d(256, 512, kernel_size=4, stride=2, padding=(0, 1)),
+            # output: (512, 26, 22)
+            nn.ReLU(True),
+            nn.Conv2d(512, 1024, kernel_size=4, stride=2, padding=0),
+            # output: (1024, 12, 10)
+            nn.ReLU(True),
+            nn.Conv2d(1024, 1024, kernel_size=4, stride=2, padding=0),
+            # output: (1024, 5, 4)
+            nn.ReLU(True),
+        )
+
+        self.bottleneck = nn.Sequential(
+            nn.Linear(1024 * 5 * 4, bottleneck),
+            nn.Linear(bottleneck, 1024 * 5 * 4),
+            nn.ReLU(True),
+        )
+
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(1024, 1024, kernel_size=4, stride=2, padding=0),
+            # output: (1024, 12, 10)
+            nn.ReLU(True),
+            nn.ConvTranspose2d(1024, 512, kernel_size=4, stride=2, padding=0),
+            # output: (512, 26, 22)
+            nn.ReLU(True),
+            nn.ConvTranspose2d(512, 256, kernel_size=4, stride=2, padding=(0, 1)),
+            # output: (256, 54, 44)
+            nn.ReLU(True),
+            nn.ConvTranspose2d(256, 128, kernel_size=4, stride=2, padding=1),
+            # output: (128, 108, 88)
+            nn.ReLU(True),
+            nn.ConvTranspose2d(128, 3, kernel_size=4, stride=2, padding=0),
+            # output: (3, 218, 178)
+            nn.Tanh(),
+        )
+
+    def forward(self, inp: torch.Tensor) -> torch.Tensor:
+        """Forward pass.
+
+        Args:
+            inp (torch.Tensor): Input tensor.
+
+        Returns:
+            out (torch.Tensor): Output tensor.
+        """
+        lat = self.encoder(inp)
+        lat_flat = lat.view(-1, 1024 * 5 * 4)
+        lat_flat = self.bottleneck(lat_flat)
+        lat = lat.view(-1, 1024, 5, 4)
+        out = self.decoder(lat)
+        return out

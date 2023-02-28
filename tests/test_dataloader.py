@@ -53,13 +53,13 @@ def test_load_celeba():
     assert isinstance(train_data.dtype, type(torch.float32))
     assert isinstance(train_label, torch.Tensor)
     assert isinstance(train_label.dtype, type(torch.int64))
-    assert train_data.size() == (3, int(128 * 218 / 178), 128)
+    assert train_data.size() == (3, 218, 178)
     assert train_label.size() == (40,)
     assert isinstance(test_data, torch.Tensor)
     assert isinstance(test_data.dtype, type(torch.float32))
     assert isinstance(test_label, torch.Tensor)
     assert isinstance(test_label.dtype, type(torch.int64))
-    assert test_data.size() == (3, int(128 * 218 / 178), 128)
+    assert test_data.size() == (3, 218, 178)
     assert test_label.size() == (40,)
 
 

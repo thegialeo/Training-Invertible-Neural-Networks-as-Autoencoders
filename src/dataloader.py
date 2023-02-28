@@ -57,7 +57,7 @@ def load_celeba() -> tuple[datasets.CelebA, datasets.CelebA]:
     """
     save_path = "./datasets/celeba"
 
-    transform = transforms.Compose([transforms.Resize(128), transforms.ToTensor()])
+    transform = transforms.Compose([transforms.ToTensor()])
 
     trainset = datasets.CelebA(
         save_path, split="train", download=True, transform=transform

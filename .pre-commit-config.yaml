@@ -21,37 +21,69 @@ repos:
         description: Detects the presence of private keys
   - repo: local
     hooks:
-      - id: pyupgrade
-        name: pyupgrade
+      - id: pyupgrade-src
+        name: pyupgrade (src/)
         stages: [commit]
         language: system
         entry: poetry run pyupgrade --py39-plus
         types: [python]
         files: src/
 
-      - id: isort
-        name: isort
+      - id: pyupgrade-tests
+        name: pyupgrade (tests/)
+        stages: [commit]
+        language: system
+        entry: poetry run pyupgrade --py39-plus
+        types: [python]
+        files: tests/
+
+      - id: isort-src
+        name: isort (src/)
         stages: [commit]
         language: system
         entry: poetry run isort
         types: [python]
         files: src/
 
-      - id: black
-        name: black
+      - id: isort-tests
+        name: isort (tests/)
+        stages: [commit]
+        language: system
+        entry: poetry run isort
+        types: [python]
+        files: tests/
+
+      - id: black-src
+        name: black (src/)
         stages: [commit]
         language: system
         entry: poetry run black
         types: [python]
         files: src/
 
-      - id: flake8
-        name: flake8
+      - id: black-tests
+        name: black (tests/)
+        stages: [commit]
+        language: system
+        entry: poetry run black
+        types: [python]
+        files: tests/
+
+      - id: flake8-src
+        name: flake8 (src/)
         stages: [commit]
         language: system
         entry: poetry run flake8
         types: [python]
         files: src/
+
+      - id: flake8-tests
+        name: flake8 (tests/)
+        stages: [commit]
+        language: system
+        entry: poetry run flake8
+        types: [python]
+        files: tests/
 
       - id: darglint
         name: darglint
