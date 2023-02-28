@@ -3,6 +3,7 @@
 Functions:
     get_mnist_inn_autoencoder (None): Returns the MNIST INN autoencoder architecture.
     get_cifar10_inn_autoencoder (None): Returns the CIFAR10 INN autoencoder architecture.
+    get_celeba_inn_autoencoder (None): Returns the CelebA INN autoencoder architecture.
 
 Classes:
     MNISTAutoencoder: Classical Autoencoder architecture for MNIST.
@@ -575,3 +576,129 @@ class CelebAAutoencoder(nn.Module):
         lat = lat.view(-1, 1024, 5, 4)
         out = self.decoder(lat)
         return out
+
+
+def get_celeba_inn_autoencoder() -> ReversibleGraphNet:
+    """Return the INN autoencoder architecture for CelebA dataset.
+
+    Returns:
+        coder (ReversibleGraphNet): CelebA INN autoencoder architecture.
+    """
+    # pylint: disable=too-many-locals
+    # FrEIA framework forces INN architecture construction with local variables
+    img_dims = [3, 128, 128]
+
+    input_node = fr.InputNode(*img_dims, name="input")
+
+    reshape_node_1 = fr.Node([(input_node, 0)], re.haar_multiplex_layer, {}, name="r1")
+
+    conv_node_11 = fr.Node(
+        [(reshape_node_1, 0)],
+        la.glow_coupling_layer,
+        {"F_class": fu.F_conv, "F_args": {"channels_hidden": 128}, "clamp": 1},
+        name="conv11",
+    )
+
+    conv_node_12 = fr.Node(
+        [(conv_node_11, 0)],
+        la.glow_coupling_layer,
+        {"F_class": fu.F_conv, "F_args": {"channels_hidden": 128}, "clamp": 1},
+        name="conv12",
+    )
+
+    conv_node_13 = fr.Node(
+        [(conv_node_12, 0)],
+        la.glow_coupling_layer,
+        {"F_class": fu.F_conv, "F_args": {"channels_hidden": 128}, "clamp": 1},
+        name="conv13",
+    )
+
+    reshape_node_2 = fr.Node(
+        [(conv_node_13, 0)], re.haar_multiplex_layer, {}, name="r2"
+    )
+
+    conv_node_21 = fr.Node(
+        [(reshape_node_2, 0)],
+        la.glow_coupling_layer,
+        {"F_class": fu.F_conv, "F_args": {"channels_hidden": 128}, "clamp": 1},
+        name="conv21",
+    )
+
+    conv_node_22 = fr.Node(
+        [(conv_node_21, 0)],
+        la.glow_coupling_layer,
+        {"F_class": fu.F_conv, "F_args": {"channels_hidden": 128}, "clamp": 1},
+        name="conv22",
+    )
+
+    conv_node_23 = fr.Node(
+        [(conv_node_22, 0)],
+        la.glow_coupling_layer,
+        {"F_class": fu.F_conv, "F_args": {"channels_hidden": 128}, "clamp": 1},
+        name="conv23",
+    )
+
+    reshape_node_3 = fr.Node(
+        [(conv_node_23, 0)],
+        re.reshape_layer,
+        {
+            "target_dim": (
+                (img_dims[0] * 4 * 4)
+                * int(img_dims[1] / 2 / 2)
+                * int(img_dims[2] / 2 / 2),
+            )
+        },
+        name="r3",
+    )
+
+    fully_con_node = fr.Node(
+        [(reshape_node_3, 0)],
+        la.rev_multiplicative_layer,
+        {"F_class": fu.F_small_connected, "F_args": {"internal_size": 200}, "clamp": 1},
+        name="fc",
+    )
+
+    reshape_node_4 = fr.Node(
+        [(fully_con_node, 0)],
+        re.reshape_layer,
+        {
+            "target_dim": (
+                img_dims[0] * 4 * 4,
+                int(img_dims[1] / 2 / 2),
+                int(img_dims[2] / 2 / 2),
+            )
+        },
+        name="r4",
+    )
+
+    reshape_node_5 = fr.Node(
+        [(reshape_node_4, 0)], re.haar_restore_layer, {}, name="r5"
+    )
+
+    reshape_node_6 = fr.Node(
+        [(reshape_node_5, 0)], re.haar_restore_layer, {}, name="r6"
+    )
+
+    output_node = fr.OutputNode([(reshape_node_6, 0)], name="output")
+
+    nodes = [
+        input_node,
+        output_node,
+        conv_node_11,
+        conv_node_12,
+        conv_node_13,
+        conv_node_21,
+        conv_node_22,
+        conv_node_23,
+        fully_con_node,
+        reshape_node_1,
+        reshape_node_2,
+        reshape_node_3,
+        reshape_node_4,
+        reshape_node_5,
+        reshape_node_6,
+    ]
+
+    coder = fr.ReversibleGraphNet(nodes, 0, 1)
+
+    return coder

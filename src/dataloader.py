@@ -48,8 +48,11 @@ def load_cifar() -> tuple[datasets.CIFAR10, datasets.CIFAR10]:
     return trainset, testset
 
 
-def load_celeba() -> tuple[datasets.CelebA, datasets.CelebA]:
+def load_celeba(resize: bool) -> tuple[datasets.CelebA, datasets.CelebA]:
     """Load CelebA dataset.
+
+    Args:
+        resize (bool): resize images to 128x128
 
     Returns:
         trainset (datasets.CelebA): training dataset
@@ -57,7 +60,12 @@ def load_celeba() -> tuple[datasets.CelebA, datasets.CelebA]:
     """
     save_path = "./datasets/celeba"
 
-    transform = transforms.Compose([transforms.ToTensor()])
+    if resize:
+        transform = transforms.Compose(
+            [transforms.Resize((128, 128)), transforms.ToTensor()]
+        )
+    else:
+        transform = transforms.Compose([transforms.ToTensor()])
 
     trainset = datasets.CelebA(
         save_path, split="train", download=True, transform=transform

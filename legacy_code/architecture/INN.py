@@ -152,4 +152,3 @@ def celeba_inn_com(mask_size=[156, 128]):
     coder = fr.ReversibleGraphNet(nodes, 0, 1)
 
     return coder
-

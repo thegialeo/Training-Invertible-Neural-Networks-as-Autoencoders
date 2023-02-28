@@ -125,7 +125,7 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# datasets
+# custom folders
 datasets/
 
 # VSCode
