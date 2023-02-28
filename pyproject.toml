@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "training_invertible_neural_networks_as_autoencoders"
 version = "0.1.0"
-description = ""
+description = "This code accompanies the paper: Nguyen, TG.L., Ardizzone, L., Köthe, U. (2019). Training Invertible Neural Networks as Autoencoders. In: Fink, G., Frintrop, S., Jiang, X. (eds) Pattern Recognition. DAGM GCPR 2019. Lecture Notes in Computer Science(), vol 11824. Springer, Cham. https://doi.org/10.1007/978-3-030-33676-9_31"
 authors = ["Xenovortex <Leo.Nguyen@gmx.de>"]
 readme = "README.md"
 packages = [{include = "FrEIA"}]
@@ -29,5 +29,3 @@ pre-commit = "^3.0.4"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-
