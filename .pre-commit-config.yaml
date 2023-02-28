@@ -2,6 +2,23 @@ default_language_version:
   python: python3.9
 
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-yaml
+        description: Check yaml files for parseable syntax
+      - id: check-added-large-files
+        description: Prevent large files from being committed
+      - id: check-merge-conflict
+        description: Check for files that contain merge conflict strings
+      - id: check-symlinks
+        description: Check for symlinks which do not point to anything
+      - id: trailing-whitespace
+        description: Trim trailing whitespaces
+      - id: end-of-file-fixer
+        description: Fix empty lines at ends of files
+      - id: detect-private-key
+        description: Detects the presence of private keys
   - repo: local
     hooks:
       - id: pyupgrade

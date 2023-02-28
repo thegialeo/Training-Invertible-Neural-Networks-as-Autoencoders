@@ -2,6 +2,7 @@
 
 Functions:
     get_mnist_inn_autoencoder (None): Returns the MNIST INN autoencoder architecture.
+    get_cifar10_inn_autoencoder (None): Returns the CIFAR10 INN autoencoder architecture.
 
 Classes:
     MNISTAutoencoder: Classical Autoencoder architecture for MNIST.
@@ -246,7 +247,7 @@ class MNISTAutoencoder2048(nn.Module):
 
 
 def get_mnist_inn_autoencoder() -> ReversibleGraphNet:
-    """Return the MNIST INN autoencoder architecture.
+    """Return the INN autoencoder architecture for MNIST.
 
     Returns:
         coder (ReversibleGraphNet): MNIST INN autoencoder architecture.
@@ -396,3 +397,82 @@ class CIFAR10Autoencoder(nn.Module):
         lat = lat.view(-1, 1024, 3, 3)
         out = self.decoder(lat)
         return out
+
+
+def get_cifar10_inn_autoencoder() -> ReversibleGraphNet:
+    """Return the INN autoencoder architecture for CIFAR10 dataset.
+
+    Returns:
+        coder (ReversibleGraphNet): CIFAR10 INN autoencoder architecture.
+    """
+    img_dims = [3, 32, 32]
+
+    input_node = fr.InputNode(*img_dims, name="input")
+
+    reshape_node_1 = fr.Node([(input_node, 0)], re.haar_multiplex_layer, {}, name="r1")
+
+    conv_node_1 = fr.Node(
+        [(reshape_node_1, 0)],
+        la.glow_coupling_layer,
+        {"F_class": fu.F_conv, "F_args": {"channels_hidden": 128}, "clamp": 1},
+        name="conv1",
+    )
+
+    conv_node_2 = fr.Node(
+        [(conv_node_1, 0)],
+        la.glow_coupling_layer,
+        {"F_class": fu.F_conv, "F_args": {"channels_hidden": 128}, "clamp": 1},
+        name="conv2",
+    )
+
+    conv_node_3 = fr.Node(
+        [(conv_node_2, 0)],
+        la.glow_coupling_layer,
+        {"F_class": fu.F_conv, "F_args": {"channels_hidden": 128}, "clamp": 1},
+        name="conv3",
+    )
+
+    reshape_node_2 = fr.Node(
+        [(conv_node_3, 0)],
+        re.reshape_layer,
+        {"target_dim": (img_dims[0] * img_dims[1] * img_dims[2],)},
+        name="r2",
+    )
+
+    fully_con_node = fr.Node(
+        [(reshape_node_2, 0)],
+        la.rev_multiplicative_layer,
+        {
+            "F_class": fu.F_small_connected,
+            "F_args": {"internal_size": 1000},
+            "clamp": 1,
+        },
+        name="fc",
+    )
+
+    reshape_node_3 = fr.Node(
+        [(fully_con_node, 0)], re.reshape_layer, {"target_dim": (12, 16, 16)}, name="r3"
+    )
+
+    reshape_node_4 = fr.Node(
+        [(reshape_node_3, 0)], re.haar_restore_layer, {}, name="r4"
+    )
+
+    output_node = fr.OutputNode([(reshape_node_4, 0)], name="output")
+
+    nodes = [
+        input_node,
+        output_node,
+        conv_node_1,
+        conv_node_2,
+        conv_node_3,
+        fully_con_node,
+        reshape_node_1,
+        reshape_node_2,
+        reshape_node_3,
+        reshape_node_4,
+    ]
+
+    coder = fr.ReversibleGraphNet(nodes, 0, 1)
+
+    return coder
