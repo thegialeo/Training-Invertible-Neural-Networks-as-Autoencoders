@@ -3,6 +3,7 @@
 Functions:
     save_numpy(ndarray, str, str) -> None: save numpy array to file.
     load_numpy(str, str) -> ndarray: load numpy array from file.
+    create_folder(str) -> None: create a folder.
     delete_file(str, str, str) -> None: delete a file.
 """
 
@@ -23,11 +24,8 @@ def save_numpy(array: np.ndarray, filename: str, folder: str = "") -> None:
     subdir = "./variables"
     path = os.path.join(subdir, folder) if folder else subdir
 
-    if not os.path.exists(subdir):
-        os.makedirs(subdir)
-
-    if not os.path.exists(path):
-        os.makedirs(path)
+    create_folder(subdir)
+    create_folder(path)
 
     with open(os.path.join(path, filename + ".npy"), "wb") as file:
         np.save(file, array)
@@ -51,6 +49,17 @@ def load_numpy(filename: str, folder: str = "") -> np.ndarray:
         array = np.load(file)
 
     return array
+
+
+def create_folder(folder: str) -> None:
+    """
+    Create a folder.
+
+    Args:
+        folder (str): The folder to create.
+    """
+    if not os.path.exists(folder):
+        os.makedirs(folder)
 
 
 def delete_file(subdir: str, filename: str, folder: str = "") -> None:

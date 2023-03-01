@@ -7,4 +7,4 @@ Lecture Notes in Computer Science(), vol 11824. Springer, Cham.
 https://doi.org/10.1007/978-3-030-33676-9_31
 """
 
-__all__ = ["architecture", "dataloader", "functionalities", "loss"]
+__all__ = ["architecture", "dataloader", "filemanager", "functionalities", "loss"]
