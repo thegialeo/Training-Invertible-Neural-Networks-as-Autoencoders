@@ -121,7 +121,7 @@ repos:
         name: pytest
         stages: [commit]
         language: system
-        entry: poetry run pytest
+        entry: poetry run pytest --cov=src --cov-report=html
         types: [python]
         pass_filenames: false
 
@@ -144,6 +144,6 @@ repos:
         name: pytest
         stages: [push]
         language: system
-        entry: poetry run pytest --cov=src --cov-report=html --cov-fail-under=100
+        entry: poetry run pytest --cov=src --cov-fail-under=100
         types: [python]
         pass_filenames: false
