@@ -14,14 +14,14 @@ import numpy as np
 
 def save_numpy(array: np.ndarray, filename: str, folder: str = "") -> None:
     """
-    Save numpy array to a file.
+    Save numpy array to a file wrapper.
 
     Args:
         array (ndarray): Numpy array to save.
         filename (str): The name of the file.
         folder (str): The folder to save the file in. Defaults to "".
     """
-    subdir = "./variables"
+    subdir = "log"
     path = os.path.join(subdir, folder) if folder else subdir
 
     create_folder(subdir)
@@ -33,16 +33,16 @@ def save_numpy(array: np.ndarray, filename: str, folder: str = "") -> None:
 
 def load_numpy(filename: str, folder: str = "") -> np.ndarray:
     """
-    Load numpy array from a file.
+    Load numpy array from a file wrapper.
 
     Args:
         filename (str): The name of the file.
         folder (str): The folder to load the file from. Defaults to "".
 
     Returns:
-        array (ndarray): Numpy array.
+        array (ndarray): Loaded numpy array.
     """
-    subdir = "./variables"
+    subdir = "log"
     path = os.path.join(subdir, folder) if folder else subdir
 
     with open(os.path.join(path, filename + ".npy"), "rb") as file:
