@@ -3,6 +3,7 @@
 Functions:
     save_numpy(ndarray, str, str) -> None: save numpy array to file.
     load_numpy(str, str) -> ndarray: load numpy array from file.
+    delete_file(str, str, str) -> None: delete a file.
 """
 
 import os
@@ -50,3 +51,18 @@ def load_numpy(filename: str, folder: str = "") -> np.ndarray:
         array = np.load(file)
 
     return array
+
+
+def delete_file(subdir: str, filename: str, folder: str = "") -> None:
+    """
+    Delete a file.
+
+    Args:
+        subdir (str): The folder to delete the file from.
+        filename (str): The name of the file.
+        folder (str): The folder to delete the file from. Defaults to "".
+    """
+    path = os.path.join(subdir, folder) if folder else subdir
+
+    if os.path.isfile(os.path.join(path, filename)):
+        os.remove(os.path.join(path, filename))
