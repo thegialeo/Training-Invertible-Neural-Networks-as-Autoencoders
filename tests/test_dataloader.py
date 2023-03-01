@@ -88,8 +88,8 @@ def test_load_celeba_resize():
 @pytest.mark.parametrize("load_dataset", [load_mnist, load_cifar])
 def test_get_loader(load_dataset):
     trainset, testset = load_dataset()
-    train_data, train_label = trainset[0]
-    test_data, test_label = testset[0]
+    train_data, _ = trainset[0]
+    test_data, _ = testset[0]
     trainloader = get_loader(trainset, 32, True)
     testloader = get_loader(testset, 32, False)
     train_data_batch, train_label_batch = next(iter(trainloader))

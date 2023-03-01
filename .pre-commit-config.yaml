@@ -6,19 +6,27 @@ repos:
     rev: v4.4.0
     hooks:
       - id: check-yaml
+        stages: [commit]
         description: Check yaml files for parseable syntax
       - id: check-added-large-files
+        stages: [commit]
         description: Prevent large files from being committed
       - id: check-merge-conflict
+        stages: [commit]
         description: Check for files that contain merge conflict strings
       - id: check-symlinks
+        stages: [commit]
         description: Check for symlinks which do not point to anything
       - id: trailing-whitespace
+        stages: [commit]
         description: Trim trailing whitespaces
       - id: end-of-file-fixer
+        stages: [commit]
         description: Fix empty lines at ends of files
       - id: detect-private-key
+        stages: [commit]
         description: Detects the presence of private keys
+
   - repo: local
     hooks:
       - id: pyupgrade-src
@@ -121,7 +129,7 @@ repos:
         name: pytest
         stages: [commit]
         language: system
-        entry: poetry run pytest --cov=src --cov-report=html
+        entry: poetry run pytest
         types: [python]
         pass_filenames: false
 
@@ -141,9 +149,9 @@ repos:
         pass_filenames: false
 
       - id: pytest-cov
-        name: pytest
+        name: pytest coverage
         stages: [push]
         language: system
-        entry: poetry run pytest --cov=src --cov-fail-under=100
+        entry: poetry run pytest --cov=src --cov-report=html --cov-fail-under=100
         types: [python]
         pass_filenames: false
