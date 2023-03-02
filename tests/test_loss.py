@@ -43,6 +43,94 @@ def test_LossTracker_compute(INN):
         assert item >= 0
 
 
+def test_LossTracker_update_inn():
+    hyp_dict = {
+        "num_epoch": 3,
+        "lat_dim": 5,
+        "a_rec": 1,
+        "a_dist": 1,
+        "a_sparse": 1,
+        "dtype": torch.float32,
+        "INN": True,
+    }
+    loss_tracker = LossTracker(hyp_dict)
+    train_losses = []
+    test_losses = []
+    for i in range(3):
+        train_loss_lst = loss_tracker.inn_loss(
+            torch.randn(4, 10), torch.randn(4, 10), torch.randn(4, 10)
+        )
+        loss_tracker.update_inn_loss(train_loss_lst, i, mode="train")
+        train_losses.append(train_loss_lst)
+        test_loss_lst = loss_tracker.inn_loss(
+            torch.randn(4, 10), torch.randn(4, 10), torch.randn(4, 10)
+        )
+        loss_tracker.update_inn_loss(test_loss_lst, i, mode="test")
+        test_losses.append(test_loss_lst)
+    recorded_train_loss = loss_tracker.get_loss(mode="train")
+    recorded_test_loss = loss_tracker.get_loss(mode="test")
+    assert isinstance(recorded_train_loss, dict)
+    assert isinstance(recorded_test_loss, dict)
+    assert isinstance(recorded_train_loss["total"], torch.Tensor)
+    assert isinstance(recorded_train_loss["rec"], torch.Tensor)
+    assert isinstance(recorded_train_loss["dist"], torch.Tensor)
+    assert isinstance(recorded_train_loss["sparse"], torch.Tensor)
+    assert isinstance(recorded_train_loss["total"].dtype, type(torch.float32))
+    assert isinstance(recorded_train_loss["rec"].dtype, type(torch.float32))
+    assert isinstance(recorded_train_loss["dist"].dtype, type(torch.float32))
+    assert isinstance(recorded_train_loss["sparse"].dtype, type(torch.float32))
+    assert isinstance(recorded_test_loss["total"], torch.Tensor)
+    assert isinstance(recorded_test_loss["rec"], torch.Tensor)
+    assert isinstance(recorded_test_loss["dist"], torch.Tensor)
+    assert isinstance(recorded_test_loss["sparse"], torch.Tensor)
+    assert isinstance(recorded_test_loss["total"].dtype, type(torch.float32))
+    assert isinstance(recorded_test_loss["rec"].dtype, type(torch.float32))
+    assert isinstance(recorded_test_loss["dist"].dtype, type(torch.float32))
+    assert isinstance(recorded_test_loss["sparse"].dtype, type(torch.float32))
+    assert recorded_train_loss["total"].size() == (3,)
+    assert recorded_train_loss["rec"].size() == (3,)
+    assert recorded_train_loss["dist"].size() == (3,)
+    assert recorded_train_loss["sparse"].size() == (3,)
+    assert recorded_test_loss["total"].size() == (3,)
+    assert recorded_test_loss["rec"].size() == (3,)
+    assert recorded_test_loss["dist"].size() == (3,)
+    assert recorded_test_loss["sparse"].size() == (3,)
+    for i, target in enumerate(train_losses):
+        assert isinstance(recorded_train_loss["total"][i], torch.Tensor)
+        assert isinstance(recorded_train_loss["rec"][i], torch.Tensor)
+        assert isinstance(recorded_train_loss["dist"][i], torch.Tensor)
+        assert isinstance(recorded_train_loss["sparse"][i], torch.Tensor)
+        assert isinstance(recorded_train_loss["total"][i].dtype, type(torch.float32))
+        assert isinstance(recorded_train_loss["rec"][i].dtype, type(torch.float32))
+        assert isinstance(recorded_train_loss["dist"][i].dtype, type(torch.float32))
+        assert isinstance(recorded_train_loss["sparse"][i].dtype, type(torch.float32))
+        assert recorded_train_loss["total"][i].dim() == 0
+        assert recorded_train_loss["rec"][i].dim() == 0
+        assert recorded_train_loss["dist"][i].dim() == 0
+        assert recorded_train_loss["sparse"][i].dim() == 0
+        assert recorded_train_loss["total"][i] == target[0]
+        assert recorded_train_loss["rec"][i] == target[1]
+        assert recorded_train_loss["dist"][i] == target[2]
+        assert recorded_train_loss["sparse"][i] == target[3]
+    for i, target in enumerate(test_losses):
+        assert isinstance(recorded_test_loss["total"][i], torch.Tensor)
+        assert isinstance(recorded_test_loss["rec"][i], torch.Tensor)
+        assert isinstance(recorded_test_loss["dist"][i], torch.Tensor)
+        assert isinstance(recorded_test_loss["sparse"][i], torch.Tensor)
+        assert isinstance(recorded_test_loss["total"][i].dtype, type(torch.float32))
+        assert isinstance(recorded_test_loss["rec"][i].dtype, type(torch.float32))
+        assert isinstance(recorded_test_loss["dist"][i].dtype, type(torch.float32))
+        assert isinstance(recorded_test_loss["sparse"][i].dtype, type(torch.float32))
+        assert recorded_test_loss["total"][i].dim() == 0
+        assert recorded_test_loss["rec"][i].dim() == 0
+        assert recorded_test_loss["dist"][i].dim() == 0
+        assert recorded_test_loss["sparse"][i].dim() == 0
+        assert recorded_test_loss["total"][i] == target[0]
+        assert recorded_test_loss["rec"][i] == target[1]
+        assert recorded_test_loss["dist"][i] == target[2]
+        assert recorded_test_loss["sparse"][i] == target[3]
+
+
 def test_LossTracker_update_classic():
     hyp_dict = {
         "num_epoch": 3,
@@ -57,10 +145,29 @@ def test_LossTracker_update_classic():
     train_losses = []
     test_losses = []
     for i in range(3):
-        loss = loss_tracker.l1_loss(torch.randn(4, 10), torch.randn(4, 10))
-        loss_tracker.update_classic_loss(loss, i, mode="train")
-        train_losses.append(loss)
-    for i in range(3):
-        loss = loss_tracker.l1_loss(torch.randn(4, 10), torch.randn(4, 10))
-        loss_tracker.update_classic_loss(loss, i, mode="test")
-        test_losses.append(loss)
+        loss_train = loss_tracker.l1_loss(torch.randn(4, 10), torch.randn(4, 10))
+        loss_tracker.update_classic_loss(loss_train, i, mode="train")
+        train_losses.append(loss_train)
+        loss_test = loss_tracker.l1_loss(torch.randn(4, 10), torch.randn(4, 10))
+        loss_tracker.update_classic_loss(loss_test, i, mode="test")
+        test_losses.append(loss_test)
+    recorded_train_loss = loss_tracker.get_loss(mode="train")
+    recorded_test_loss = loss_tracker.get_loss(mode="test")
+    assert isinstance(recorded_train_loss, dict)
+    assert isinstance(recorded_test_loss, dict)
+    assert isinstance(recorded_train_loss["total"], torch.Tensor)
+    assert isinstance(recorded_train_loss["total"].dtype, type(torch.float32))
+    assert isinstance(recorded_test_loss["total"], torch.Tensor)
+    assert isinstance(recorded_test_loss["total"].dtype, type(torch.float32))
+    assert recorded_train_loss["total"].size() == (3,)
+    assert recorded_test_loss["total"].size() == (3,)
+    for i, target in enumerate(train_losses):
+        assert isinstance(recorded_train_loss["total"][i], torch.Tensor)
+        assert isinstance(recorded_train_loss["total"][i].dtype, type(torch.float))
+        assert recorded_train_loss["total"][i].dim() == 0
+        assert recorded_train_loss["total"][i] == target
+    for i, target in enumerate(test_losses):
+        assert isinstance(recorded_test_loss["total"][i], torch.Tensor)
+        assert isinstance(recorded_test_loss["total"][i].dtype, type(torch.float))
+        assert recorded_test_loss["total"][i].dim() == 0
+        assert recorded_test_loss["total"][i] == target
