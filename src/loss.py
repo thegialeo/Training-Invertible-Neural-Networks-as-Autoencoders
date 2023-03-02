@@ -4,7 +4,6 @@ Classes:
     LossTracker: compute and tracks loss values.
 """
 
-import numpy as np
 import torch
 
 from src.functionalities import get_device
@@ -23,6 +22,8 @@ class LossTracker:
         l2_loss(Tensor, Tensor) -> Tensor: L2 norm loss function
         mmd_multiscale(Tensor, Tensor) -> Tensor: MMD loss function
         inn_loss(Tensor, Tensor, Tensor) -> Tensor: INN Autoencoder loss function loss
+        update_inn_loss(list[Tensor], int, str) -> None: track inn autoencoder loss
+        update_classic_loss(Tensor, int, str) -> None: track classic autoencoder loss
     """
 
     def __init__(self, hyp_dict: dict) -> None:
@@ -32,18 +33,22 @@ class LossTracker:
             hyp_dict (dict): collection of hyperparameters
         """
         self.hyp_dict = hyp_dict
-        self.train_loss = {
-            "total": np.zeros(hyp_dict["num_epoch"]),
-            "rec": np.zeros(hyp_dict["num_epoch"]),
-            "dist": np.zeros(hyp_dict["num_epoch"]),
-            "sparse": np.zeros(hyp_dict["num_epoch"]),
-        }
-        self.test_loss = {
-            "total": np.zeros(hyp_dict["num_epoch"]),
-            "rec": np.zeros(hyp_dict["num_epoch"]),
-            "dist": np.zeros(hyp_dict["num_epoch"]),
-            "sparse": np.zeros(hyp_dict["num_epoch"]),
-        }
+        if hyp_dict["INN"]:
+            self.train_loss = {
+                "total": torch.zeros(hyp_dict["num_epoch"]),
+                "rec": torch.zeros(hyp_dict["num_epoch"]),
+                "dist": torch.zeros(hyp_dict["num_epoch"]),
+                "sparse": torch.zeros(hyp_dict["num_epoch"]),
+            }
+            self.test_loss = {
+                "total": torch.zeros(hyp_dict["num_epoch"]),
+                "rec": torch.zeros(hyp_dict["num_epoch"]),
+                "dist": torch.zeros(hyp_dict["num_epoch"]),
+                "sparse": torch.zeros(hyp_dict["num_epoch"]),
+            }
+        else:
+            self.train_loss = {"total": torch.zeros(hyp_dict["num_epoch"])}
+            self.test_loss = {"total": torch.zeros(hyp_dict["num_epoch"])}
 
     def l1_loss(self, pred: torch.Tensor, label: torch.Tensor) -> torch.Tensor:
         """L1-norm loss function (least absolute deviations).
@@ -177,3 +182,49 @@ class LossTracker:
         l_total = l_rec + l_dist + l_sparse
 
         return [l_total, l_rec, l_dist, l_sparse]
+
+    def update_inn_loss(self, loss: list[torch.Tensor], epoch: int, mode: str) -> None:
+        """Track INN Autoencoder loss.
+
+        Args:
+            loss (list[torch.Tensor]): loss values to be tracked.
+            epoch (int): current epoch
+            mode (str): training or testing mode. Options: "train", "test".
+
+        Raises:
+            ValueError: if mode is not 'train' or 'test'
+        """
+        if mode == "train":
+            self.train_loss["total"][epoch] = loss[0]
+            self.train_loss["rec"][epoch] = loss[1]
+            self.train_loss["dist"][epoch] = loss[2]
+            self.train_loss["sparse"][epoch] = loss[3]
+        elif mode == "test":
+            self.test_loss["total"][epoch] = loss[0]
+            self.test_loss["rec"][epoch] = loss[1]
+            self.test_loss["dist"][epoch] = loss[2]
+            self.test_loss["sparse"][epoch] = loss[3]
+        else:
+            raise ValueError(
+                f"Mode {mode} is not supported. Options are 'train' and 'test'."
+            )
+
+    def update_classic_loss(self, loss: torch.Tensor, epoch: int, mode: str) -> None:
+        """Track classic autoencoder loss.
+
+        Args:
+            loss (torch.Tensor): loss values to be tracked.
+            epoch (int): current epoch
+            mode (str): training or testing mode. Options: "train", "test".
+
+        Raises:
+            ValueError: if mode is not 'train' or 'test'
+        """
+        if mode == "train":
+            self.train_loss["total"][epoch] = loss
+        elif mode == "test":
+            self.test_loss["total"][epoch] = loss
+        else:
+            raise ValueError(
+                f"Mode {mode} is not supported. Options are 'train' and 'test'."
+            )

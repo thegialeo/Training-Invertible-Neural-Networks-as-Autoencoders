@@ -1,9 +1,11 @@
+import pytest
 import torch
 
 from src.loss import LossTracker
 
 
-def test_LossTracker():
+@pytest.mark.parametrize("INN", [True, False])
+def test_LossTracker_compute(INN):
     hyp_dict = {
         "num_epoch": 3,
         "lat_dim": 5,
@@ -11,6 +13,7 @@ def test_LossTracker():
         "a_dist": 1,
         "a_sparse": 1,
         "dtype": torch.float32,
+        "INN": INN,
     }
     loss_tracker = LossTracker(hyp_dict)
     pred = torch.randn(4, 10)
@@ -38,3 +41,7 @@ def test_LossTracker():
         assert isinstance(item.dtype, type(torch.float32))
         assert item.dim() == 0
         assert item >= 0
+
+
+def test_LossTracker_update():
+    pass
