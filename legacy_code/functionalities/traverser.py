@@ -112,4 +112,3 @@ def traverse_continous_grid(latent_dim, input_size, idx, axis, num_sample, grid_
                         samples[i * (num_sample // grid_row_size) + j, idx_2] = cont_traversal[i]
 
     return torch.Tensor(samples)
-

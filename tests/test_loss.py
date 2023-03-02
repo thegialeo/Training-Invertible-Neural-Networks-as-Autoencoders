@@ -36,6 +36,7 @@ def test_LossTracker_compute(INN):
     assert mmd_loss.dim() == 0
     assert mmd_loss >= 0
     assert isinstance(inn_loss, list)
+    assert len(inn_loss) == 4
     for item in inn_loss:
         assert isinstance(item, torch.Tensor)
         assert isinstance(item.dtype, type(torch.float32))
@@ -87,6 +88,8 @@ def test_LossTracker_update_inn():
     assert isinstance(recorded_test_loss["rec"].dtype, type(torch.float32))
     assert isinstance(recorded_test_loss["dist"].dtype, type(torch.float32))
     assert isinstance(recorded_test_loss["sparse"].dtype, type(torch.float32))
+    assert len(recorded_train_loss) == 4
+    assert len(recorded_test_loss) == 4
     assert recorded_train_loss["total"].size() == (3,)
     assert recorded_train_loss["rec"].size() == (3,)
     assert recorded_train_loss["dist"].size() == (3,)
@@ -159,6 +162,8 @@ def test_LossTracker_update_classic():
     assert isinstance(recorded_train_loss["total"].dtype, type(torch.float32))
     assert isinstance(recorded_test_loss["total"], torch.Tensor)
     assert isinstance(recorded_test_loss["total"].dtype, type(torch.float32))
+    assert len(recorded_train_loss) == 1
+    assert len(recorded_test_loss) == 1
     assert recorded_train_loss["total"].size() == (3,)
     assert recorded_test_loss["total"].size() == (3,)
     for i, target in enumerate(train_losses):
@@ -171,3 +176,27 @@ def test_LossTracker_update_classic():
         assert isinstance(recorded_test_loss["total"][i].dtype, type(torch.float))
         assert recorded_test_loss["total"][i].dim() == 0
         assert recorded_test_loss["total"][i] == target
+
+
+@pytest.mark.parametrize("INN", [True, False])
+def test_LossTracker_raises(INN):
+    hyp_dict = {
+        "num_epoch": 3,
+        "lat_dim": 5,
+        "a_rec": 1,
+        "a_dist": 1,
+        "a_sparse": 1,
+        "dtype": torch.float32,
+        "INN": INN,
+    }
+    loss_tracker = LossTracker(hyp_dict)
+    l1_loss = loss_tracker.l1_loss(torch.randn(4, 10), torch.randn(4, 10))
+    inn_loss = loss_tracker.inn_loss(
+        torch.randn(4, 10), torch.randn(4, 10), torch.randn(4, 10)
+    )
+    with pytest.raises(ValueError):
+        loss_tracker.update_classic_loss(l1_loss, 0, mode="non-valid-mode")
+    with pytest.raises(ValueError):
+        loss_tracker.update_inn_loss(inn_loss, 0, mode="non-valid-mode")
+    with pytest.raises(ValueError):
+        loss_tracker.get_loss(mode="non-valid-mode")
