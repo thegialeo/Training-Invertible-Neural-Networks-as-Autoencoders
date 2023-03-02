@@ -80,7 +80,7 @@ class MMD_autoencoder_loss(nn.Module):
             l_distr = self.a_distr * loss.MMD_multiscale(v[:, 1:self.latent_dim], y, self.device)
             l_sparse = self.a_spar * torch.mean(v[:, self.latent_dim:] ** 2)
             l_disc = self.a_disc * torch.mean(torch.min(torch.abs(v[:, :1] - self.disc_lst), 1)[0])
-            l = l_rec.to(self.device) + l_distr.to(self.device) + l_sparse.to(self.device) + l_disen.to(self.device) + l_disc.to(self.device) 
+            l = l_rec.to(self.device) + l_distr.to(self.device) + l_sparse.to(self.device) + l_disen.to(self.device) + l_disc.to(self.device)
             return [l, l_rec, l_distr, l_sparse, l_disen, l_disc]
         else:
             y = v.new_empty((v.size(0), self.latent_dim)).normal_()

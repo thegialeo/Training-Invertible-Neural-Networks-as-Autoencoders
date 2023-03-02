@@ -1,9 +1,10 @@
 """Loss Functions used for training.
 
 Functions:
-    l1_loss(torch.Tensor, torch.Tensor, torch.dtype) -> torch.Tensor: L1 norm loss function
-    l2_loss(torch.Tensor, torch.Tensor, torch.dtype) -> torch.Tensor: L2 norm loss function
-    mmd_multiscale(torch.Tensor, torch.Tensor, torch.dtype, str) -> torch.Tensor: MMD loss function
+    l1_loss(Tensor, Tensor, dtype) -> Tensor: L1 norm loss function
+    l2_loss(Tensor, Tensor, dtype) -> Tensor: L2 norm loss function
+    mmd_multiscale(Tensor, Tensor, dtype, str) -> Tensor: MMD loss function
+    inn_loss(Tensor, Tensor, Tensor, dict, dtype) -> Tensor: INN Autoencoder loss function loss
 """
 
 from typing import Optional
@@ -55,7 +56,6 @@ def mmd_multiscale(
     p_samples: torch.Tensor,
     q_samples: torch.Tensor,
     dtype: Optional[torch.dtype] = torch.float32,
-    device: Optional[str] = get_device(),
 ) -> torch.Tensor:
     """Multi-scale kernel Maximum Mean Discrepancy loss function.
 
@@ -63,11 +63,11 @@ def mmd_multiscale(
         p_samples (torch.Tensor): samples from distribution P
         q_samples (torch.Tensor): samples from distribution Q
         dtype (torch.dtype): return type. Defaults to torch.float32.
-        device (str): device. Defaults to get_device().
 
     Returns:
         loss (torch.Tensor): MMD loss between predictions and labels
     """
+    device = get_device()
     p_samples, q_samples = p_samples.to(device), q_samples.to(device)
 
     step_pp = (
@@ -130,3 +130,39 @@ def mmd_multiscale(
     loss = torch.mean(sim_matrix_pp + sim_matrix_qq - 2.0 * sim_matrix_pq, dtype=dtype)
 
     return loss
+
+
+def inn_loss(
+    inp: torch.Tensor,
+    rec: torch.Tensor,
+    lat: torch.Tensor,
+    hyp_dict: dict,
+    dtype: Optional[torch.dtype] = torch.float32,
+) -> list[torch.Tensor]:
+    """Compute INN Autoencoder loss.
+
+    Args:
+        inp (torch.Tensor): input image
+        rec (torch.Tensor): reconstructed image
+        lat (torch.Tensor): latent vector
+        hyp_dict (dict): collection of hyperparameters (latent dimension and loss term coefficients)
+        dtype (torch.dtype): return type. Defaults to torch.float32.
+
+    Returns:
+        list[torch.Tensor]: total, reconstruction, distribution and sparse loss
+    """
+    base_dist = torch.normal(0, 1, size=(lat.size(0), hyp_dict["lat_dim"]))
+
+    l_rec = hyp_dict["a_rec"] * l1_loss(inp, rec, dtype=dtype)
+    l_dist = hyp_dict["a_dist"] * mmd_multiscale(
+        lat[:, : hyp_dict["lat_dim"]], base_dist, dtype=dtype
+    )
+    l_sparse = hyp_dict["a_sparse"] * l2_loss(
+        lat[:, hyp_dict["lat_dim"] :],
+        torch.zeros(lat.size(0), lat.size(1) - hyp_dict["lat_dim"]),
+        dtype=dtype,
+    )
+
+    l_total = l_rec + l_dist + l_sparse
+
+    return [l_total, l_rec, l_dist, l_sparse]

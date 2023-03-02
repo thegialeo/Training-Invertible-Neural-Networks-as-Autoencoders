@@ -1,9 +1,9 @@
 """Classical and INN Autoencoder architectures.
 
 Functions:
-    get_mnist_inn_autoencoder (None): Returns the MNIST INN autoencoder architecture.
-    get_cifar10_inn_autoencoder (None): Returns the CIFAR10 INN autoencoder architecture.
-    get_celeba_inn_autoencoder (None): Returns the CelebA INN autoencoder architecture.
+    get_mnist_inn_autoencoder (None) -> RGNet: Returns the MNIST INN autoencoder architecture.
+    get_cifar10_inn_autoencoder (None) -> RGNet: Returns the CIFAR10 INN autoencoder architecture.
+    get_celeba_inn_autoencoder (None) -> RGNet: Returns the CelebA INN autoencoder architecture.
 
 Classes:
     MNISTAutoencoder: Classical Autoencoder architecture for MNIST.

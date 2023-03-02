@@ -150,4 +150,3 @@ def delete_file(subdir, filename, folder=None):
 
     if os.path.isfile(path):
         os.remove(path)
-

@@ -2,7 +2,7 @@
 
 Functions:
     get_device(int) -> str: get torch device name
-    count_param(torch.nn.Module) -> int: count the number of trainable parameters in a model
+    count_param(nn.Module) -> int: count the number of trainable parameters in a model
 """
 
 import torch

@@ -5,6 +5,8 @@ Functions:
     delete_file(str, str, str) -> None: delete a file.
     save_numpy(ndarray, str, str) -> None: save numpy array to file.
     load_numpy(str, str) -> ndarray: load numpy array from file.
+    save_model(model str, str) -> None: save model to file.
+    load_model(model, str, str) -> model: load model from file.
 """
 
 import os
