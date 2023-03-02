@@ -43,5 +43,24 @@ def test_LossTracker_compute(INN):
         assert item >= 0
 
 
-def test_LossTracker_update():
-    pass
+def test_LossTracker_update_classic():
+    hyp_dict = {
+        "num_epoch": 3,
+        "lat_dim": 5,
+        "a_rec": 1,
+        "a_dist": 1,
+        "a_sparse": 1,
+        "dtype": torch.float32,
+        "INN": False,
+    }
+    loss_tracker = LossTracker(hyp_dict)
+    train_losses = []
+    test_losses = []
+    for i in range(3):
+        loss = loss_tracker.l1_loss(torch.randn(4, 10), torch.randn(4, 10))
+        loss_tracker.update_classic_loss(loss, i, mode="train")
+        train_losses.append(loss)
+    for i in range(3):
+        loss = loss_tracker.l1_loss(torch.randn(4, 10), torch.randn(4, 10))
+        loss_tracker.update_classic_loss(loss, i, mode="test")
+        test_losses.append(loss)

@@ -24,6 +24,7 @@ class LossTracker:
         inn_loss(Tensor, Tensor, Tensor) -> Tensor: INN Autoencoder loss function loss
         update_inn_loss(list[Tensor], int, str) -> None: track inn autoencoder loss
         update_classic_loss(Tensor, int, str) -> None: track classic autoencoder loss
+        get_loss(str) -> dict: returns tracked loss values
     """
 
     def __init__(self, hyp_dict: dict) -> None:
@@ -228,3 +229,24 @@ class LossTracker:
             raise ValueError(
                 f"Mode {mode} is not supported. Options are 'train' and 'test'."
             )
+
+    def get_loss(self, mode: str) -> dict[str, torch.Tensor]:
+        """Get loss values.
+
+        Args:
+            mode (str): return train or test loss. Options: "train", "test".
+
+        Returns:
+            dict[str, torch.Tensor]: loss values
+
+        Raises:
+            ValueError: if mode is not 'train' or 'test'
+        """
+        if mode == "train":
+            return self.train_loss
+        if mode == "test":
+            return self.test_loss
+
+        raise ValueError(
+            f"Mode {mode} is not supported. Options are 'train' and 'test'."
+        )
