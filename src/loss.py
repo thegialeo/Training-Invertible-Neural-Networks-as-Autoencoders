@@ -34,6 +34,7 @@ class LossTracker:
             hyp_dict (dict): collection of hyperparameters
         """
         self.hyp_dict = hyp_dict
+        self.device = get_device()
         if hyp_dict["INN"]:
             self.train_loss = {
                 "total": torch.zeros(hyp_dict["num_epoch"]),
@@ -61,6 +62,7 @@ class LossTracker:
         Returns:
             loss (torch.Tensor): L1-norm loss between predictions and labels
         """
+        pred, label = pred.to(self.device), label.to(self.device)
         loss = torch.mean(torch.abs(pred - label), dtype=self.hyp_dict["dtype"])
         return loss
 
@@ -74,6 +76,7 @@ class LossTracker:
         Returns:
             loss (torch.Tensor): L2-norm loss between predictions and labels
         """
+        pred, label = pred.to(self.device), label.to(self.device)
         loss = torch.mean(torch.pow(pred - label, 2), dtype=self.hyp_dict["dtype"])
         return loss
 
@@ -89,8 +92,7 @@ class LossTracker:
         Returns:
             loss (torch.Tensor): MMD loss between predictions and labels
         """
-        device = get_device()
-        p_samples, q_samples = p_samples.to(device), q_samples.to(device)
+        p_samples, q_samples = p_samples.to(self.device), q_samples.to(self.device)
 
         step_pp = (
             (
@@ -139,9 +141,9 @@ class LossTracker:
         )
 
         sim_matrix_pp, sim_matrix_qq, sim_matrix_pq = (
-            torch.zeros(step_pp.shape).to(device),
-            torch.zeros(step_pp.shape).to(device),
-            torch.zeros(step_pp.shape).to(device),
+            torch.zeros(step_pp.shape).to(self.device),
+            torch.zeros(step_pp.shape).to(self.device),
+            torch.zeros(step_pp.shape).to(self.device),
         )
 
         for bandwidth in [0.2, 0.5, 0.9, 1.3]:
