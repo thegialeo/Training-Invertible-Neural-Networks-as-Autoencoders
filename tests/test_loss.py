@@ -1,6 +1,7 @@
 import pytest
 import torch
 
+from src.functionalities import get_device
 from src.loss import LossTracker
 
 
@@ -8,14 +9,13 @@ from src.loss import LossTracker
 def test_LossTracker_compute(INN):
     hyp_dict = {
         "num_epoch": 3,
-        "lat_dim": 5,
         "a_rec": 1,
         "a_dist": 1,
         "a_sparse": 1,
         "dtype": torch.float32,
         "INN": INN,
     }
-    loss_tracker = LossTracker(hyp_dict)
+    loss_tracker = LossTracker(5, hyp_dict, device=get_device())
     pred = torch.randn(4, 10)
     label = torch.randn(4, 10)
     lat = torch.randn(4, 10)
@@ -47,14 +47,13 @@ def test_LossTracker_compute(INN):
 def test_LossTracker_update_inn():
     hyp_dict = {
         "num_epoch": 3,
-        "lat_dim": 5,
         "a_rec": 1,
         "a_dist": 1,
         "a_sparse": 1,
         "dtype": torch.float32,
         "INN": True,
     }
-    loss_tracker = LossTracker(hyp_dict)
+    loss_tracker = LossTracker(5, hyp_dict, device=get_device())
     train_losses = []
     test_losses = []
     for i in range(3):
@@ -137,14 +136,13 @@ def test_LossTracker_update_inn():
 def test_LossTracker_update_classic():
     hyp_dict = {
         "num_epoch": 3,
-        "lat_dim": 5,
         "a_rec": 1,
         "a_dist": 1,
         "a_sparse": 1,
         "dtype": torch.float32,
         "INN": False,
     }
-    loss_tracker = LossTracker(hyp_dict)
+    loss_tracker = LossTracker(5, hyp_dict, device=get_device())
     train_losses = []
     test_losses = []
     for i in range(3):
@@ -182,14 +180,13 @@ def test_LossTracker_update_classic():
 def test_LossTracker_raises(INN):
     hyp_dict = {
         "num_epoch": 3,
-        "lat_dim": 5,
         "a_rec": 1,
         "a_dist": 1,
         "a_sparse": 1,
         "dtype": torch.float32,
         "INN": INN,
     }
-    loss_tracker = LossTracker(hyp_dict)
+    loss_tracker = LossTracker(5, hyp_dict, device=get_device())
     l1_loss = loss_tracker.l1_loss(torch.randn(4, 10), torch.randn(4, 10))
     inn_loss = loss_tracker.inn_loss(
         torch.randn(4, 10), torch.randn(4, 10), torch.randn(4, 10)

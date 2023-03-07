@@ -37,3 +37,14 @@ def count_param(model: torch.nn.Module) -> int:
     num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     return num_params
+
+
+def init_weights(model: torch.nn.Module) -> None:
+    """Initialize the weights of a model.
+
+    Args:
+        model (torch.nn.Module): model to initialize weights
+    """
+    if isinstance(model, torch.nn.Linear):
+        torch.nn.init.xavier_uniform(model.weight)
+        model.bias.data.fill_(0.01)

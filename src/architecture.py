@@ -702,3 +702,20 @@ def get_celeba_inn_autoencoder() -> ReversibleGraphNet:
     coder = fr.ReversibleGraphNet(nodes, 0, 1)
 
     return coder
+
+
+# ---------------------------------------------------------------------------- #
+#                                  Entry Point                                 #
+# ---------------------------------------------------------------------------- #
+
+MODEL_ARCHITECTURES = {
+    "mnist_classic": MNISTAutoencoder,
+    "mnist_classic1024": MNISTAutoencoder1024,
+    "mnist_classicDeep1024": MNISTAutoencoderDeep1024,
+    "mnist_classic2048": MNISTAutoencoder2048,
+    "mnist_inn": get_mnist_inn_autoencoder,
+    "cifar_classic": CIFAR10Autoencoder,
+    "cifar_inn": get_cifar10_inn_autoencoder,
+    "celeba_clasic": CelebAAutoencoder,
+    "celeba_inn": get_celeba_inn_autoencoder,
+}

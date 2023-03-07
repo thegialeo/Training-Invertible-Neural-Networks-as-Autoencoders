@@ -6,14 +6,14 @@ Classes:
 
 import torch
 
-from src.functionalities import get_device
-
 
 class LossTracker:
     """Class for computing and tracking loss values.
 
     Attributes:
+        lat_dim (int): number of latent dimensions.
         hyp_dict (dict): collection of hyperparameters
+        device (str): device used for computation
         train_loss_dict (dict): training loss values logger
         test_loss_dict (dict): test loss values logger
 
@@ -27,14 +27,17 @@ class LossTracker:
         get_loss(str) -> dict: returns tracked loss values
     """
 
-    def __init__(self, hyp_dict: dict) -> None:
+    def __init__(self, lat_dim: int, hyp_dict: dict, device: str) -> None:
         """Initialize loss tracker.
 
         Args:
-            hyp_dict (dict): collection of hyperparameters
+            lat_dim (int): number of latent dimensions.
+            hyp_dict (dict): collection of hyperparameters.
+            device (str): torch device used for computation.
         """
+        self.lat_dim = lat_dim
         self.hyp_dict = hyp_dict
-        self.device = get_device()
+        self.device = device
         if hyp_dict["INN"]:
             self.train_loss = {
                 "total": torch.zeros(hyp_dict["num_epoch"]),
@@ -171,26 +174,26 @@ class LossTracker:
         Returns:
             list[torch.Tensor]: total, reconstruction, distribution and sparse loss
         """
-        base_dist = torch.normal(0, 1, size=(lat.size(0), self.hyp_dict["lat_dim"]))
+        base_dist = torch.normal(0, 1, size=(lat.size(0), self.lat_dim))
 
         l_rec = self.hyp_dict["a_rec"] * self.l1_loss(inp, rec)
         l_dist = self.hyp_dict["a_dist"] * self.mmd_multiscale(
-            lat[:, : self.hyp_dict["lat_dim"]], base_dist
+            lat[:, : self.lat_dim], base_dist
         )
         l_sparse = self.hyp_dict["a_sparse"] * self.l2_loss(
-            lat[:, self.hyp_dict["lat_dim"] :],
-            torch.zeros(lat.size(0), lat.size(1) - self.hyp_dict["lat_dim"]),
+            lat[:, self.lat_dim :],
+            torch.zeros(lat.size(0), lat.size(1) - self.lat_dim),
         )
 
         l_total = l_rec + l_dist + l_sparse
 
         return [l_total, l_rec, l_dist, l_sparse]
 
-    def update_inn_loss(self, loss: list[torch.Tensor], epoch: int, mode: str) -> None:
+    def update_inn_loss(self, loss: torch.Tensor, epoch: int, mode: str) -> None:
         """Track INN Autoencoder loss.
 
         Args:
-            loss (list[torch.Tensor]): loss values to be tracked.
+            loss (torch.Tensor): loss values to be tracked.
             epoch (int): current epoch
             mode (str): training or testing mode. Options: "train", "test".
 
