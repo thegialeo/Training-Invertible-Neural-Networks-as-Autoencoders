@@ -1,9 +1,9 @@
 """Classical and INN Autoencoder architectures.
 
 Functions:
-    get_mnist_inn_autoencoder (None) -> RGNet: Returns the MNIST INN autoencoder architecture.
-    get_cifar10_inn_autoencoder (None) -> RGNet: Returns the CIFAR10 INN autoencoder architecture.
-    get_celeba_inn_autoencoder (None) -> RGNet: Returns the CelebA INN autoencoder architecture.
+    get_mnist_inn_autoencoder (None) -> nn.Module: Returns the MNIST INN autoencoder architecture.
+    get_cifar10_inn_autoencoder (None) -> nn.Module: Returns the CIFAR INN autoencoder architecture.
+    get_celeba_inn_autoencoder (None) -> nn.Module: Returns the CelebA INN autoencoder architecture.
 
 Classes:
     MNISTAutoencoder: Classical Autoencoder architecture for MNIST.
@@ -18,7 +18,6 @@ import torch
 from torch import nn
 
 from FrEIA import framework as fr
-from FrEIA.framework import ReversibleGraphNet
 from FrEIA.modules import coeff_functs as fu
 from FrEIA.modules import coupling_layers as la
 from FrEIA.modules import reshapes as re
@@ -248,11 +247,11 @@ class MNISTAutoencoder2048(nn.Module):
         return out
 
 
-def get_mnist_inn_autoencoder() -> ReversibleGraphNet:
+def get_mnist_inn_autoencoder() -> nn.Module:
     """Return the INN autoencoder architecture for MNIST.
 
     Returns:
-        coder (ReversibleGraphNet): MNIST INN autoencoder architecture.
+        coder (nn.Module): MNIST INN autoencoder architecture.
     """
     img_dims = [1, 28, 28]
 
@@ -415,11 +414,11 @@ class CIFAR10Autoencoder(nn.Module):
         return out
 
 
-def get_cifar10_inn_autoencoder() -> ReversibleGraphNet:
+def get_cifar10_inn_autoencoder() -> nn.Module:
     """Return the INN autoencoder architecture for CIFAR10 dataset.
 
     Returns:
-        coder (ReversibleGraphNet): CIFAR10 INN autoencoder architecture.
+        coder (nn.Module): CIFAR10 INN autoencoder architecture.
     """
     img_dims = [3, 32, 32]
 
@@ -578,11 +577,11 @@ class CelebAAutoencoder(nn.Module):
         return out
 
 
-def get_celeba_inn_autoencoder() -> ReversibleGraphNet:
+def get_celeba_inn_autoencoder() -> nn.Module:
     """Return the INN autoencoder architecture for CelebA dataset.
 
     Returns:
-        coder (ReversibleGraphNet): CelebA INN autoencoder architecture.
+        coder (nn.Module): CelebA INN autoencoder architecture.
     """
     # pylint: disable=too-many-locals
     # FrEIA framework forces INN architecture construction with local variables
@@ -705,17 +704,20 @@ def get_celeba_inn_autoencoder() -> ReversibleGraphNet:
 
 
 # ---------------------------------------------------------------------------- #
-#                                  Entry Point                                 #
+#                                 Entry Points                                 #
 # ---------------------------------------------------------------------------- #
 
-MODEL_ARCHITECTURES = {
+INN_ARCHITECTURES = {
+    "mnist_inn": get_mnist_inn_autoencoder,
+    "cifar_inn": get_cifar10_inn_autoencoder,
+    "celeba_inn": get_celeba_inn_autoencoder,
+}
+
+CLASSIC_ARCHITECTURES = {
     "mnist_classic": MNISTAutoencoder,
     "mnist_classic1024": MNISTAutoencoder1024,
     "mnist_classicDeep1024": MNISTAutoencoderDeep1024,
     "mnist_classic2048": MNISTAutoencoder2048,
-    "mnist_inn": get_mnist_inn_autoencoder,
     "cifar_classic": CIFAR10Autoencoder,
-    "cifar_inn": get_cifar10_inn_autoencoder,
     "celeba_clasic": CelebAAutoencoder,
-    "celeba_inn": get_celeba_inn_autoencoder,
 }
