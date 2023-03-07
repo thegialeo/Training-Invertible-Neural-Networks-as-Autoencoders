@@ -10,6 +10,7 @@ from src.functionalities import (
     get_optimizer,
     init_weights,
 )
+from src.settings import HYPERPARAMETER
 
 
 def test_get_device():
@@ -44,15 +45,8 @@ def test_init_weights():
 
 @pytest.mark.parametrize("modelname", ["mnist_inn", "cifar_inn", "celeba_inn"])
 def test_get_model_optimizer_inn(modelname):
-    hyp_dict = {
-        "modelname": modelname,
-        "INN": True,
-        "lr": 1e-3,
-        "betas": (0.8, 0.8),
-        "eps": 1e-4,
-        "weight_decay": 1e-6,
-    }
-    model = get_model(5, hyp_dict)
+    hyp_dict = HYPERPARAMETER[modelname]
+    model = get_model(5, modelname, hyp_dict)
     optimizer = get_optimizer(model, hyp_dict)
     assert isinstance(model, torch.nn.Module)
     assert isinstance(optimizer, torch.optim.Adam)
@@ -70,15 +64,8 @@ def test_get_model_optimizer_inn(modelname):
     ],
 )
 def test_get_model_optimizer_classic(modelname):
-    hyp_dict = {
-        "modelname": modelname,
-        "INN": False,
-        "lr": 1e-3,
-        "betas": (0.9, 0.999),
-        "eps": 1e-08,
-        "weight_decay": 1e-5,
-    }
-    model = get_model(5, hyp_dict)
+    hyp_dict = HYPERPARAMETER[modelname]
+    model = get_model(5, modelname, hyp_dict)
     optimizer = get_optimizer(model, hyp_dict)
     assert isinstance(model, torch.nn.Module)
     assert isinstance(optimizer, torch.optim.Adam)

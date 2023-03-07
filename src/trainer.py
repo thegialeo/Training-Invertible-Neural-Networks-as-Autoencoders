@@ -1,0 +1,148 @@
+"""Training for classic and INN Autoencoder.
+
+Classes:
+    INNTrainer: trains an INN Autoencoder.
+"""
+
+
+import torch
+from tqdm.autonotebook import tqdm
+
+from src.filemanager import save_model, save_numpy
+from src.functionalities import get_device, get_model, get_optimizer
+from src.loss import LossTracker
+
+
+class Trainer:
+    """Class to train classic and INN autoencoders.
+
+    Attributes:
+        lat_dim (int): latent dimension.
+        hyp_dict (dict): dictionary containing hyperparameters.
+        tracker (class): loss tracker
+        model (nn.Module): model to train and evaluate.
+        optimizer (torch.optimizer): optimizer to use.
+        scheduler (torch.lr_scheduler): scheduler to use.
+
+    Methods:
+        train_inn(torch.Dataloader) -> None: trains an INN Autoencoder.
+    """
+
+    def __init__(self, lat_dim: int, modelname: str, hyp_dict: dict) -> None:
+        """Initialize the trainer.
+
+        Args:
+            lat_dim (int): latent dimension.
+            modelname (str): name of the model.
+            hyp_dict (dict): collections of hyperparameters.
+        """
+        self.lat_dim = lat_dim
+        self.modelname = modelname
+        self.hyp_dict = hyp_dict
+        self.hyp_dict["device"] = get_device()
+        self.tracker = LossTracker(self.lat_dim, self.hyp_dict, self.hyp_dict["device"])
+        self.model = get_model(self.lat_dim, self.modelname, self.hyp_dict)
+        self.optimizer = get_optimizer(self.model, self.hyp_dict)
+        self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            self.optimizer, milestones=hyp_dict["milestones"], gamma=0.1
+        )
+
+    def train_inn(
+        self, trainloader: torch.utils.data.DataLoader, subdir: str = ""
+    ) -> None:
+        """Trains an INN Autoencoder.
+
+        Args:
+            trainloader (torch.utils.data.DataLoader): dataloader for training.
+            subdir (str): subdirectory to save the model. Defaults to None.
+        """
+        print(f"Start training for latent dimension: {self.lat_dim}")
+
+        self.model.to(self.hyp_dict["device"])
+        self.model.train()
+
+        for epoch in range(self.hyp_dict["num_epoch"]):
+            losses = torch.zeros(4, dtype=self.hyp_dict["dtype"])
+
+            for data, target in tqdm(trainloader):
+                data, target = data.to(self.hyp_dict["device"]), target.to(
+                    self.hyp_dict["device"]
+                )
+
+                self.optimizer.zero_grad()
+
+                lat_img = self.model(data)
+                lat_shape = lat_img.shape
+
+                lat_img = lat_img.view(lat_shape[0], -1)
+                lat_img_zero = torch.cat(
+                    [
+                        lat_img[:, : self.lat_dim],
+                        lat_img.new_zeros((lat_img[:, self.lat_dim :]).shape),
+                    ],
+                    dim=1,
+                )
+                lat_img_zero = lat_img_zero.view(lat_shape)
+
+                rec = self.model(lat_img_zero, rev=True)
+
+                batch_loss = self.tracker.inn_loss(data, rec, lat_img)
+
+                batch_loss[0].backward()
+                self.optimizer.step()
+                self.scheduler.step()
+
+                for i in range(4):
+                    losses[i] += batch_loss[i].item()
+
+            losses /= len(trainloader)
+            self.tracker.update_inn_loss(losses, epoch, mode="train")
+
+            print(
+                f"Loss: {losses[0].cpu().detach():.3f} \t"
+                + f"L_rec: {losses[1].cpu().detach():.3f} \t"
+                + f"L_dist: {losses[2].cpu().detach():.3f} \t"
+                + f"L_spar: {losses[3].cpu().detach():.3f}"
+            )
+            print("\n")
+            print("-" * 80)
+            print("\n")
+
+        print("Finished training")
+
+        self.model.to("cpu")
+        save_model(self.model, f"{self.modelname}", subdir)
+
+        train_loss_dict = self.tracker.get_loss(mode="train")
+        save_numpy(
+            train_loss_dict["total"].cpu().detach().numpy(),
+            self.modelname + "_train_total",
+            subdir,
+        )
+        save_numpy(
+            train_loss_dict["rec"].cpu().detach().numpy(),
+            self.modelname + "_train_rec",
+            subdir,
+        )
+        save_numpy(
+            train_loss_dict["dist"].cpu().detach().numpy(),
+            self.modelname + "_train_dist",
+            subdir,
+        )
+        save_numpy(
+            train_loss_dict["sparse"].cpu().detach().numpy(),
+            self.modelname + "_train_sparse",
+            subdir,
+        )
+
+    def train_classic(
+        self, trainloader: torch.utils.data.DataLoader, subdir: str = ""
+    ) -> None:
+        """Trains a classic Autoencoder.
+
+        Args:
+            trainloader (torch.utils.data.DataLoader): dataloader for training.
+            subdir (str): subdirectory to save the model. Defaults to None.
+        """
+        # pylint: disable=W0107
+        pass

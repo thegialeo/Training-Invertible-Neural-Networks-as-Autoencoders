@@ -10,6 +10,7 @@ packages = [{include = "FrEIA"}]
 python = "^3.9"
 torch = "^1.13.1"
 torchvision = "^0.14.1"
+tqdm = "^4.65.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "23.1a1"

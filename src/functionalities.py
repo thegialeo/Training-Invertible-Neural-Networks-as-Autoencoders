@@ -54,18 +54,19 @@ def init_weights(model: torch.nn.Module) -> None:
         model.bias.data.fill_(0.01)
 
 
-def get_model(lat_dim: int, hyp_dict: dict) -> torch.nn.Module:
+def get_model(lat_dim: int, modelname: str, hyp_dict: dict) -> torch.nn.Module:
     """Get a model by name.
 
     Args:
         lat_dim (int): latent dimension
+        modelname (str): model name
         hyp_dict (dict): collection of hyperparameters
 
     Returns:
         model (torch.nn.Module): model
     """
     if hyp_dict["INN"]:
-        model = cast(torch.nn.Module, INN_ARCHITECTURES[hyp_dict["modelname"]]())
+        model = cast(torch.nn.Module, INN_ARCHITECTURES[modelname]())
         for key, param in model.named_parameters():
             split = key.split(".")
             if param.requires_grad:
@@ -73,9 +74,7 @@ def get_model(lat_dim: int, hyp_dict: dict) -> torch.nn.Module:
                 if split[3][-1] == "3":
                     param.data.fill_(0.0)
     else:
-        model = cast(
-            torch.nn.Module, CLASSIC_ARCHITECTURES[hyp_dict["modelname"]](lat_dim)
-        )
+        model = cast(torch.nn.Module, CLASSIC_ARCHITECTURES[modelname](lat_dim))
         model.apply(init_weights)
 
     return model
