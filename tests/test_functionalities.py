@@ -1,7 +1,15 @@
+import pytest
 import torch
 import torchvision.models as models
 
-from src.functionalities import count_param, get_device
+from src.architecture import CLASSIC_ARCHITECTURES
+from src.functionalities import (
+    count_param,
+    get_device,
+    get_model,
+    get_optimizer,
+    init_weights,
+)
 
 
 def test_get_device():
@@ -24,3 +32,53 @@ def test_count_param():
     num_params = count_param(alexnet)
     assert isinstance(num_params, int)
     assert num_params == 61100840
+
+
+def test_init_weights():
+    model = CLASSIC_ARCHITECTURES["mnist_classic"](5)
+    model_params = model.parameters()
+    model.apply(init_weights)
+    new_model_params = model.parameters()
+    assert model_params != new_model_params
+
+
+@pytest.mark.parametrize("modelname", ["mnist_inn", "cifar_inn", "celeba_inn"])
+def test_get_model_optimizer_inn(modelname):
+    hyp_dict = {
+        "modelname": modelname,
+        "INN": True,
+        "lr": 1e-3,
+        "betas": (0.8, 0.8),
+        "eps": 1e-4,
+        "weight_decay": 1e-6,
+    }
+    model = get_model(5, hyp_dict)
+    optimizer = get_optimizer(model, hyp_dict)
+    assert isinstance(model, torch.nn.Module)
+    assert isinstance(optimizer, torch.optim.Adam)
+
+
+@pytest.mark.parametrize(
+    "modelname",
+    [
+        "mnist_classic",
+        "mnist_classic1024",
+        "mnist_classicDeep1024",
+        "mnist_classic2048",
+        "cifar_classic",
+        "celeba_classic",
+    ],
+)
+def test_get_model_optimizer_classic(modelname):
+    hyp_dict = {
+        "modelname": modelname,
+        "INN": False,
+        "lr": 1e-3,
+        "betas": (0.9, 0.999),
+        "eps": 1e-08,
+        "weight_decay": 1e-5,
+    }
+    model = get_model(5, hyp_dict)
+    optimizer = get_optimizer(model, hyp_dict)
+    assert isinstance(model, torch.nn.Module)
+    assert isinstance(optimizer, torch.optim.Adam)

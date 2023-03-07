@@ -719,5 +719,5 @@ CLASSIC_ARCHITECTURES = {
     "mnist_classicDeep1024": MNISTAutoencoderDeep1024,
     "mnist_classic2048": MNISTAutoencoder2048,
     "cifar_classic": CIFAR10Autoencoder,
-    "celeba_clasic": CelebAAutoencoder,
+    "celeba_classic": CelebAAutoencoder,
 }

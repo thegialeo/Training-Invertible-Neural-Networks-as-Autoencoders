@@ -43,6 +43,17 @@ def count_param(model: torch.nn.Module) -> int:
     return num_params
 
 
+def init_weights(model: torch.nn.Module) -> None:
+    """Initialize the weights of a model.
+
+    Args:
+        model (torch.nn.Module): model to initialize weights
+    """
+    if isinstance(model, torch.nn.Linear):
+        torch.nn.init.xavier_uniform_(model.weight)
+        model.bias.data.fill_(0.01)
+
+
 def get_model(lat_dim: int, hyp_dict: dict) -> torch.nn.Module:
     """Get a model by name.
 
@@ -54,7 +65,7 @@ def get_model(lat_dim: int, hyp_dict: dict) -> torch.nn.Module:
         model (torch.nn.Module): model
     """
     if hyp_dict["INN"]:
-        model = cast(torch.nn.Module, INN_ARCHITECTURES[hyp_dict["modelname"]])
+        model = cast(torch.nn.Module, INN_ARCHITECTURES[hyp_dict["modelname"]]())
         for key, param in model.named_parameters():
             split = key.split(".")
             if param.requires_grad:
@@ -65,7 +76,6 @@ def get_model(lat_dim: int, hyp_dict: dict) -> torch.nn.Module:
         model = cast(
             torch.nn.Module, CLASSIC_ARCHITECTURES[hyp_dict["modelname"]](lat_dim)
         )
-        model(lat_dim)
         model.apply(init_weights)
 
     return model
@@ -98,14 +108,3 @@ def get_optimizer(model: torch.nn.Module, hyp_dict: dict) -> torch.optim.Optimiz
     )
 
     return optimizer
-
-
-def init_weights(model: torch.nn.Module) -> None:
-    """Initialize the weights of a model.
-
-    Args:
-        model (torch.nn.Module): model to initialize weights
-    """
-    if isinstance(model, torch.nn.Linear):
-        torch.nn.init.xavier_uniform(model.weight)
-        model.bias.data.fill_(0.01)
