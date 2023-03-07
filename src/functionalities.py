@@ -43,19 +43,18 @@ def count_param(model: torch.nn.Module) -> int:
     return num_params
 
 
-def get_model(modelname: str, is_inn: bool, lat_dim: int) -> torch.nn.Module:
+def get_model(lat_dim: int, hyp_dict: dict) -> torch.nn.Module:
     """Get a model by name.
 
     Args:
-        modelname (str): model name
-        is_inn (bool): whether the model is an INN or not
         lat_dim (int): latent dimension
+        hyp_dict (dict): collection of hyperparameters
 
     Returns:
         model (torch.nn.Module): model
     """
-    if is_inn:
-        model = cast(torch.nn.Module, INN_ARCHITECTURES[modelname])
+    if hyp_dict["INN"]:
+        model = cast(torch.nn.Module, INN_ARCHITECTURES[hyp_dict["modelname"]])
         for key, param in model.named_parameters():
             split = key.split(".")
             if param.requires_grad:
@@ -63,11 +62,42 @@ def get_model(modelname: str, is_inn: bool, lat_dim: int) -> torch.nn.Module:
                 if split[3][-1] == "3":
                     param.data.fill_(0.0)
     else:
-        model = cast(torch.nn.Module, CLASSIC_ARCHITECTURES[modelname](lat_dim))
+        model = cast(
+            torch.nn.Module, CLASSIC_ARCHITECTURES[hyp_dict["modelname"]](lat_dim)
+        )
         model(lat_dim)
         model.apply(init_weights)
 
     return model
+
+
+def get_optimizer(model: torch.nn.Module, hyp_dict: dict) -> torch.optim.Optimizer:
+    """Get optimizer and learning rate scheduler.
+
+    Args:
+        model (torch.nn.Module): model
+        hyp_dict (dict): collection of hyperparameters
+
+    Returns:
+        optimizer (torch.optim.Optimizer): optimizer
+    """
+    model_params = []
+    for param in model.parameters():
+        if param.requires_grad:
+            model_params.append(param)
+
+    optimizer = cast(
+        torch.optim.Optimizer,
+        torch.optim.Adam(
+            model_params,
+            lr=hyp_dict["lr"],
+            betas=hyp_dict["betas"],
+            eps=hyp_dict["eps"],
+            weight_decay=hyp_dict["weight_decay"],
+        ),
+    )
+
+    return optimizer
 
 
 def init_weights(model: torch.nn.Module) -> None:
