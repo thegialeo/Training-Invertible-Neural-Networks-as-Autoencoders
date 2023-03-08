@@ -73,7 +73,6 @@ class Trainer:
 
                 lat_img = self.model(data)
                 lat_shape = lat_img.shape
-
                 lat_img = lat_img.view(lat_shape[0], -1)
                 lat_img_zero = torch.cat(
                     [
@@ -83,12 +82,11 @@ class Trainer:
                     dim=1,
                 )
                 lat_img_zero = lat_img_zero.view(lat_shape)
-
                 rec = self.model(lat_img_zero, rev=True)
 
                 batch_loss = self.tracker.inn_loss(data, rec, lat_img)
-
                 batch_loss[0].backward()
+
                 self.optimizer.step()
                 self.scheduler.step()
 
@@ -145,7 +143,50 @@ class Trainer:
             subdir (str): subdirectory to save the model. Defaults to None.
         """
         # pylint: disable=W0107
-        pass
+        print(f"Start training for latent dimension: {self.lat_dim}")
+
+        self.model.to(self.hyp_dict["device"])
+        self.model.train()
+
+        for epoch in range(self.hyp_dict["num_epoch"]):
+            losses = torch.zeros(1, dtype=self.hyp_dict["dtype"])
+
+            for data, target in tqdm(trainloader):
+                data, target = data.to(self.hyp_dict["device"]), target.to(
+                    self.hyp_dict["device"]
+                )
+
+                self.optimizer.zero_grad()
+
+                rec = self.model(data)
+
+                loss = self.tracker.l1_loss(data, rec)
+                loss.backward()
+
+                self.optimizer.step()
+                self.scheduler.step()
+
+                losses += loss.item()
+
+            losses /= len(trainloader)
+            self.tracker.update_classic_loss(losses, epoch, mode="train")
+
+            print(f"Loss: {losses.cpu().detach():.3f}")
+            print("\n")
+            print("-" * 80)
+            print("\n")
+
+            print("Finished training")
+
+            self.model.to("cpu")
+            save_model(self.model, f"{self.modelname}", subdir)
+
+            train_loss_dict = self.tracker.get_loss(mode="train")
+            save_numpy(
+                train_loss_dict["rec"].cpu().detach().numpy(),
+                self.modelname + "_train_rec",
+                subdir,
+            )
 
     def evaluate_inn(self, loader: torch.utils.data.DataLoader) -> float:
         """Evaluate reconstruction loss on INN Autoencoder.

@@ -156,24 +156,24 @@ def test_LossTracker_update_classic():
     recorded_test_loss = loss_tracker.get_loss(mode="test")
     assert isinstance(recorded_train_loss, dict)
     assert isinstance(recorded_test_loss, dict)
-    assert isinstance(recorded_train_loss["total"], torch.Tensor)
-    assert isinstance(recorded_train_loss["total"].dtype, type(torch.float32))
-    assert isinstance(recorded_test_loss["total"], torch.Tensor)
-    assert isinstance(recorded_test_loss["total"].dtype, type(torch.float32))
+    assert isinstance(recorded_train_loss["rec"], torch.Tensor)
+    assert isinstance(recorded_train_loss["rec"].dtype, type(torch.float32))
+    assert isinstance(recorded_test_loss["rec"], torch.Tensor)
+    assert isinstance(recorded_test_loss["rec"].dtype, type(torch.float32))
     assert len(recorded_train_loss) == 1
     assert len(recorded_test_loss) == 1
-    assert recorded_train_loss["total"].size() == (3,)
-    assert recorded_test_loss["total"].size() == (3,)
+    assert recorded_train_loss["rec"].size() == (3,)
+    assert recorded_test_loss["rec"].size() == (3,)
     for i, target in enumerate(train_losses):
-        assert isinstance(recorded_train_loss["total"][i], torch.Tensor)
-        assert isinstance(recorded_train_loss["total"][i].dtype, type(torch.float))
-        assert recorded_train_loss["total"][i].dim() == 0
-        assert recorded_train_loss["total"][i] == target
+        assert isinstance(recorded_train_loss["rec"][i], torch.Tensor)
+        assert isinstance(recorded_train_loss["rec"][i].dtype, type(torch.float))
+        assert recorded_train_loss["rec"][i].dim() == 0
+        assert recorded_train_loss["rec"][i] == target
     for i, target in enumerate(test_losses):
-        assert isinstance(recorded_test_loss["total"][i], torch.Tensor)
-        assert isinstance(recorded_test_loss["total"][i].dtype, type(torch.float))
-        assert recorded_test_loss["total"][i].dim() == 0
-        assert recorded_test_loss["total"][i] == target
+        assert isinstance(recorded_test_loss["rec"][i], torch.Tensor)
+        assert isinstance(recorded_test_loss["rec"][i].dtype, type(torch.float))
+        assert recorded_test_loss["rec"][i].dim() == 0
+        assert recorded_test_loss["rec"][i] == target
 
 
 @pytest.mark.parametrize("INN", [True, False])

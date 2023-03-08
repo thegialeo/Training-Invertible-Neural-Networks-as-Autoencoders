@@ -52,8 +52,8 @@ class LossTracker:
                 "sparse": torch.zeros(hyp_dict["num_epoch"]),
             }
         else:
-            self.train_loss = {"total": torch.zeros(hyp_dict["num_epoch"])}
-            self.test_loss = {"total": torch.zeros(hyp_dict["num_epoch"])}
+            self.train_loss = {"rec": torch.zeros(hyp_dict["num_epoch"])}
+            self.test_loss = {"rec": torch.zeros(hyp_dict["num_epoch"])}
 
     def l1_loss(self, pred: torch.Tensor, label: torch.Tensor) -> torch.Tensor:
         """L1-norm loss function (least absolute deviations).
@@ -227,9 +227,9 @@ class LossTracker:
             ValueError: if mode is not 'train' or 'test'
         """
         if mode == "train":
-            self.train_loss["total"][epoch] = loss
+            self.train_loss["rec"][epoch] = loss
         elif mode == "test":
-            self.test_loss["total"][epoch] = loss
+            self.test_loss["rec"][epoch] = loss
         else:
             raise ValueError(
                 f"Mode {mode} is not supported. Options are 'train' and 'test'."
