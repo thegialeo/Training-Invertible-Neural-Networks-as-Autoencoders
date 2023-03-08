@@ -3,6 +3,9 @@
 Functions:
     get_device(int) -> str: get torch device name
     count_param(nn.Module) -> int: count the number of trainable parameters in a model
+    init_weigths(nn.Module) -> None: initialize model weights
+    get_model(int, str, dict) -> nn.Module: initialize and returns model
+    get_optimizer(nn.Module, dict) -> torch.optimizer: initialize and returns optimizer
 """
 
 from typing import cast

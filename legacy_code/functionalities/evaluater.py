@@ -32,7 +32,7 @@ def get_loss(loader, model, criterion, latent_dim, tracker, conditional=False, d
         losses = np.zeros(5, dtype=np.double)
 
     tracker.reset()
-    
+
     correct = 0
 
     for i, data in enumerate(tqdm(loader), 0):
@@ -80,7 +80,7 @@ def get_loss(loader, model, criterion, latent_dim, tracker, conditional=False, d
                 losses[i] += batch_loss[i].item()
 
             tracker.update(lat_img)
-            
+
     correct = correct * 100. / len(loader.dataset)
     if use_label or conditional:
         print('Test Accuracy: {:.1f}'.format(correct))

@@ -1,7 +1,7 @@
 """Training for classic and INN Autoencoder.
 
 Classes:
-    INNTrainer: trains an INN Autoencoder.
+    Trainer: train and evaluate INN/classic Autoencoder.
 """
 
 
@@ -18,6 +18,7 @@ class Trainer:
 
     Attributes:
         lat_dim (int): latent dimension.
+        modelname (str): name of the model
         hyp_dict (dict): dictionary containing hyperparameters.
         tracker (class): loss tracker
         model (nn.Module): model to train and evaluate.
@@ -25,7 +26,10 @@ class Trainer:
         scheduler (torch.lr_scheduler): scheduler to use.
 
     Methods:
-        train_inn(torch.Dataloader) -> None: trains an INN Autoencoder.
+        train_inn(torch.Dataloader, str) -> None: trains an INN Autoencoder.
+        train_classic(torch.Dataloader, str) -> None: trains classic autoencoder.
+        evaluate_inn(torch.Dataloader) -> float: evaluate INN autoencoder.
+        evaluate_classic(torch.Dataloader) -> float: evaluate classic autoencoder.
     """
 
     def __init__(self, lat_dim: int, modelname: str, hyp_dict: dict) -> None:
