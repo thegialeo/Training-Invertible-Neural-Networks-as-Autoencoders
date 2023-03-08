@@ -157,7 +157,6 @@ class Trainer:
                 )
 
                 self.optimizer.zero_grad()
-
                 rec = self.model(data)
 
                 loss = self.tracker.l1_loss(data, rec)
@@ -166,27 +165,27 @@ class Trainer:
                 self.optimizer.step()
                 self.scheduler.step()
 
-                losses += loss.item()
+                losses[0] += loss.item()
 
             losses /= len(trainloader)
             self.tracker.update_classic_loss(losses, epoch, mode="train")
 
-            print(f"Loss: {losses.cpu().detach():.3f}")
+            print(f"Loss: {losses[0].cpu().detach():.3f}")
             print("\n")
             print("-" * 80)
             print("\n")
 
-            print("Finished training")
+        print("Finished training")
 
-            self.model.to("cpu")
-            save_model(self.model, f"{self.modelname}", subdir)
+        self.model.to("cpu")
+        save_model(self.model, f"{self.modelname}", subdir)
 
-            train_loss_dict = self.tracker.get_loss(mode="train")
-            save_numpy(
-                train_loss_dict["rec"].cpu().detach().numpy(),
-                self.modelname + "_train_rec",
-                subdir,
-            )
+        train_loss_dict = self.tracker.get_loss(mode="train")
+        save_numpy(
+            train_loss_dict["rec"].cpu().detach().numpy(),
+            self.modelname + "_train_rec",
+            subdir,
+        )
 
     def evaluate_inn(self, loader: torch.utils.data.DataLoader) -> float:
         """Evaluate reconstruction loss on INN Autoencoder.
