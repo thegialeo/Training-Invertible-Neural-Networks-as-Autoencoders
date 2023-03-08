@@ -21,7 +21,7 @@ def test_Trainer_inn(test_cases):
     trainer = Trainer(5, modelname, hyp_dict)
     start_model = trainer.model
     if modelname == "celeba_inn":
-        trainset, _ = load_celeba(True)
+        trainset, _ = load_data(True)
     else:
         trainset, _ = load_data()
     trainloader = get_loader(torch.utils.data.Subset(trainset, [1, 2, 3, 4]), 2, True)

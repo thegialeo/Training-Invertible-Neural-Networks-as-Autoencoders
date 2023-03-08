@@ -146,3 +146,66 @@ class Trainer:
         """
         # pylint: disable=W0107
         pass
+
+    def evaluate_inn(self, loader: torch.utils.data.DataLoader) -> float:
+        """Evaluate reconstruction loss on INN Autoencoder.
+
+        Args:
+            loader (torch.utils.data.DataLoader): dataloader for evaluation.
+
+        Returns:
+            loss (float): mean reconstruction loss
+        """
+        self.model.to(self.hyp_dict["device"])
+        self.model.eval()
+
+        with torch.no_grad():
+            loss = 0.0
+
+            for data, target in tqdm(loader):
+                data, target = data.to(self.hyp_dict["device"]), target.to(
+                    self.hyp_dict["device"]
+                )
+                lat_img = self.model(data)
+                lat_shape = lat_img.shape
+                lat_img = lat_img.view(lat_shape[0], -1)
+                lat_img_zero = torch.cat(
+                    [
+                        lat_img[:, : self.lat_dim],
+                        lat_img.new_zeros((lat_img[:, self.lat_dim :]).shape),
+                    ],
+                    dim=1,
+                )
+                lat_img_zero = lat_img_zero.view(lat_shape)
+                rec = self.model(lat_img_zero, rev=True)
+                loss += self.tracker.l1_loss(data, rec).cpu().item()
+
+            loss /= len(loader)
+
+        return loss
+
+    def evaluate_classic(self, loader: torch.utils.data.DataLoader) -> float:
+        """Evaluate reconstruction loss on classic Autoencoder.
+
+        Args:
+            loader (torch.utils.data.DataLoader): dataloader for evaluation.
+
+        Returns:
+            loss (float): mean reconstruction loss
+        """
+        self.model.to(self.hyp_dict["device"])
+        self.model.eval()
+
+        with torch.no_grad():
+            loss = 0.0
+
+            for data, target in tqdm(loader):
+                data, target = data.to(self.hyp_dict["device"]), target.to(
+                    self.hyp_dict["device"]
+                )
+                rec = self.model(data)
+                loss += self.tracker.l1_loss(data, rec).cpu().item()
+
+            loss /= len(loader)
+
+        return loss
