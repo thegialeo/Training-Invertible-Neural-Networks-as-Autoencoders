@@ -6,10 +6,11 @@ Classes:
 
 
 import torch
+import torchvision
 from tqdm.autonotebook import tqdm
 
 from src.filemanager import save_model, save_numpy
-from src.functionalities import get_device, get_model, get_optimizer
+from src.functionalities import get_device, get_model, get_optimizer, plot_image
 from src.loss import LossTracker
 
 
@@ -253,3 +254,43 @@ class Trainer:
             loss /= len(loader)
 
         return loss
+
+    def plot_inn(
+        self, loader: torch.utils.data.DataLoader, num_img: int, grid_row_size: int
+    ) -> None:
+        """Plot original, reconstructed and diffrence images for INN Autoencoder.
+
+        Args:
+            loader (torch.utils.data.DataLoader): dataloader for plotting
+            num_img (int): The number of images to plot
+            grid_row_size (int): number of images in a row of the grid
+        """
+        self.model.to(self.hyp_dict["device"])
+        self.model.eval()
+
+        data, target = next(iter(loader))
+        data, target = data.to(self.hyp_dict["device"]), target.to(
+            self.hyp_dict["device"]
+        )
+
+        lat_img = self.model(data)
+        lat_shape = lat_img.shape
+        lat_img = lat_img.view(lat_img.size(0), -1)
+        lat_img_zero = torch.cat(
+            [
+                lat_img[:, : self.lat_dim],
+                lat_img.new_zeros((lat_img[:, self.lat_dim :]).shape),
+            ],
+            dim=1,
+        )
+        lat_img_zero = lat_img_zero.view(lat_shape)
+        rec = self.model(lat_img_zero, rev=True)
+
+        plot_image(
+            torchvision.utils.make_grid(data[:num_img].cpu().detach(), grid_row_size),
+            f"{self.modelname}_original",
+        )
+        plot_image(
+            torchvision.utils.make_grid(rec[:num_img].cpu().detach(), grid_row_size),
+            f"{self.modelname}_reconstructed",
+        )
