@@ -285,6 +285,7 @@ class Trainer:
         )
         lat_img_zero = lat_img_zero.view(lat_shape)
         rec = self.model(lat_img_zero, rev=True)
+        diff_img = (data - rec + 1) / 2
 
         plot_image(
             torchvision.utils.make_grid(data[:num_img].cpu().detach(), grid_row_size),
@@ -293,4 +294,10 @@ class Trainer:
         plot_image(
             torchvision.utils.make_grid(rec[:num_img].cpu().detach(), grid_row_size),
             f"{self.modelname}_reconstructed",
+        )
+        plot_image(
+            torchvision.utils.make_grid(
+                diff_img[:num_img].cpu().detach(), grid_row_size
+            ),
+            f"{self.modelname}_difference",
         )
