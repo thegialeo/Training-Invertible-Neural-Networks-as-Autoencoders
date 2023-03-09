@@ -256,7 +256,11 @@ class Trainer:
         return loss
 
     def plot_inn(
-        self, loader: torch.utils.data.DataLoader, num_img: int, grid_row_size: int
+        self,
+        loader: torch.utils.data.DataLoader,
+        num_img: int,
+        grid_row_size: int,
+        folder: str = "",
     ) -> None:
         """Plot input, reconstructed and difference images for INN Autoencoder.
 
@@ -264,6 +268,7 @@ class Trainer:
             loader (torch.utils.data.DataLoader): dataloader for plotting
             num_img (int): The number of images to plot
             grid_row_size (int): number of images in a row of the grid
+            folder (str): The folder to save the file in. Defaults to "".
         """
         self.model.to(self.hyp_dict["device"])
         self.model.eval()
@@ -290,20 +295,27 @@ class Trainer:
         plot_image(
             torchvision.utils.make_grid(data[:num_img].cpu().detach(), grid_row_size),
             f"{self.modelname}_original",
+            folder,
         )
         plot_image(
             torchvision.utils.make_grid(rec[:num_img].cpu().detach(), grid_row_size),
             f"{self.modelname}_reconstructed",
+            folder,
         )
         plot_image(
             torchvision.utils.make_grid(
                 diff_img[:num_img].cpu().detach(), grid_row_size
             ),
             f"{self.modelname}_difference",
+            folder,
         )
 
     def plot_classic(
-        self, loader: torch.utils.data.DataLoader, num_img: int, grid_row_size: int
+        self,
+        loader: torch.utils.data.DataLoader,
+        num_img: int,
+        grid_row_size: int,
+        folder: str = "",
     ) -> None:
         """Plot input, reconstructed and difference images for classic autoencoder.
 
@@ -311,6 +323,7 @@ class Trainer:
             loader (torch.utils.data.DataLoader): dataloader for plotting
             num_img (int): The number of images to plot
             grid_row_size (int): number of images in a row of the grid
+            folder (str): The folder to save the file in. Defaults to "".
         """
         self.model.to(self.hyp_dict["device"])
         self.model.eval()
@@ -326,14 +339,17 @@ class Trainer:
         plot_image(
             torchvision.utils.make_grid(data[:num_img].cpu().detach(), grid_row_size),
             f"{self.modelname}_original",
+            folder,
         )
         plot_image(
             torchvision.utils.make_grid(rec[:num_img].cpu().detach(), grid_row_size),
             f"{self.modelname}_reconstructed",
+            folder,
         )
         plot_image(
             torchvision.utils.make_grid(
                 diff_img[:num_img].cpu().detach(), grid_row_size
             ),
             f"{self.modelname}_difference",
+            folder,
         )
