@@ -258,7 +258,7 @@ class Trainer:
     def plot_inn(
         self, loader: torch.utils.data.DataLoader, num_img: int, grid_row_size: int
     ) -> None:
-        """Plot original, reconstructed and diffrence images for INN Autoencoder.
+        """Plot input, reconstructed and difference images for INN Autoencoder.
 
         Args:
             loader (torch.utils.data.DataLoader): dataloader for plotting
@@ -285,6 +285,42 @@ class Trainer:
         )
         lat_img_zero = lat_img_zero.view(lat_shape)
         rec = self.model(lat_img_zero, rev=True)
+        diff_img = (data - rec + 1) / 2
+
+        plot_image(
+            torchvision.utils.make_grid(data[:num_img].cpu().detach(), grid_row_size),
+            f"{self.modelname}_original",
+        )
+        plot_image(
+            torchvision.utils.make_grid(rec[:num_img].cpu().detach(), grid_row_size),
+            f"{self.modelname}_reconstructed",
+        )
+        plot_image(
+            torchvision.utils.make_grid(
+                diff_img[:num_img].cpu().detach(), grid_row_size
+            ),
+            f"{self.modelname}_difference",
+        )
+
+    def plot_classic(
+        self, loader: torch.utils.data.DataLoader, num_img: int, grid_row_size: int
+    ) -> None:
+        """Plot input, reconstructed and difference images for classic autoencoder.
+
+        Args:
+            loader (torch.utils.data.DataLoader): dataloader for plotting
+            num_img (int): The number of images to plot
+            grid_row_size (int): number of images in a row of the grid
+        """
+        self.model.to(self.hyp_dict["device"])
+        self.model.eval()
+
+        data, target = next(iter(loader))
+        data, target = data.to(self.hyp_dict["device"]), target.to(
+            self.hyp_dict["device"]
+        )
+
+        rec = self.model(data)
         diff_img = (data - rec + 1) / 2
 
         plot_image(
