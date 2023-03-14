@@ -6,7 +6,7 @@ from src.loss import LossTracker
 
 
 @pytest.mark.parametrize("INN", [True, False])
-def test_LossTracker_compute(INN):
+def test_losstracker_compute(INN):
     hyp_dict = {
         "num_epoch": 3,
         "a_rec": 1,
@@ -44,7 +44,7 @@ def test_LossTracker_compute(INN):
         assert item >= 0
 
 
-def test_LossTracker_update_inn():
+def test_losstracker_update_inn():
     hyp_dict = {
         "num_epoch": 3,
         "a_rec": 1,
@@ -133,7 +133,7 @@ def test_LossTracker_update_inn():
         assert recorded_test_loss["sparse"][i] == target[3]
 
 
-def test_LossTracker_update_classic():
+def test_losstracker_update_classic():
     hyp_dict = {
         "num_epoch": 3,
         "a_rec": 1,
@@ -177,7 +177,7 @@ def test_LossTracker_update_classic():
 
 
 @pytest.mark.parametrize("INN", [True, False])
-def test_LossTracker_raises(INN):
+def test_losstracker_raises(INN):
     hyp_dict = {
         "num_epoch": 3,
         "a_rec": 1,

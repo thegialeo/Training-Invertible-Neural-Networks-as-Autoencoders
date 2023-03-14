@@ -74,7 +74,7 @@ def train(num_epoch, model, modelname, criterion, optimizer, scheduler, latent_d
             losses = np.zeros(6, dtype=np.double)
         else:
             losses = np.zeros(5, dtype=np.double)
-            
+
         print('length of losses:', len(losses))
 
         scheduler.step()
@@ -246,7 +246,7 @@ def train(num_epoch, model, modelname, criterion, optimizer, scheduler, latent_d
 
 def train_bottleneck(num_epoch, get_model, loss_type, modelname, milestones, latent_dim_lst, trainloader,
                      validloader=None, testloader=None, a_distr=1, a_rec=1, a_spar=1, a_disen=1, lr_init=1e-3,
-                     l2_reg=1e-6, conditional=False, disc_lst=None, use_label=False, device='cpu', save_model=False, 
+                     l2_reg=1e-6, conditional=False, disc_lst=None, use_label=False, device='cpu', save_model=False,
                      save_variable=True, use_lat_dim=False, num_epoch_save=10, num_img=100, grid_row_size=10):
     """
     Train INN model for various bottleneck sizes.
@@ -299,7 +299,7 @@ def train_bottleneck(num_epoch, get_model, loss_type, modelname, milestones, lat
         model.to(device)
 
         model = train(num_epoch, model, modelname + "_{}".format(latent_dim), criterion, optimizer, scheduler,
-                      latent_dim, trainloader, validloader, testloader, conditional, disc_lst, use_label, track, device, save_model, 
+                      latent_dim, trainloader, validloader, testloader, conditional, disc_lst, use_label, track, device, save_model,
                       save_variable, modelname + "_bottleneck", num_epoch_save, num_img, grid_row_size)
 
         train_losses = ev.get_loss(trainloader, model, criterion, latent_dim, track, device)
@@ -326,16 +326,16 @@ def train_bottleneck(num_epoch, get_model, loss_type, modelname, milestones, lat
 
     fm.save_variable([tot_train_loss_log, rec_train_loss_log, dist_train_loss_log, spar_train_loss_log,
                       disen_train_loss_log], "bottleneck_train_loss_{}".format(modelname), modelname)
-    
-    
+
+
 def train_bottleneck_classic(num_epoch, get_model, modelname, milestones, latent_dim_lst, trainloader,
-                     validloader=None, testloader=None, lr_init=1e-3, device='cpu', mnist=False):    
+                     validloader=None, testloader=None, lr_init=1e-3, device='cpu', mnist=False):
     """
     Train classical model for various bottleneck sizes.
     """
-    
+
     bottleneck_train_log = []
-    bottleneck_test_log = []    
+    bottleneck_test_log = []
 
     for bottleneck in latent_dim_lst:
         print('bottleneck dimension: {}'.format(bottleneck))
@@ -390,7 +390,7 @@ def train_bottleneck_classic(num_epoch, get_model, modelname, milestones, latent
         fm.save_variable([train_loss_log, test_loss_log], "{}_{}".format(modelname, bottleneck))
 
     fm.save_variable([bottleneck_train_log, bottleneck_test_log], "{}_bottleneck".format(modelname))
-    
+
 
 def init_model(get_model, latent_dim, loss_type, device, a_distr=1, a_rec=1, a_spar=1, a_disen=1, a_disc=0, conditional=False, disc_lst=None, use_lat_dim=False, cont_min=None, cont_max=None, num_iter=None, init_weight=True):
     """

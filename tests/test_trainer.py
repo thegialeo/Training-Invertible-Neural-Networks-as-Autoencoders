@@ -13,7 +13,7 @@ from src.trainer import Trainer
     "modelname, load_data",
     [("mnist_inn", load_mnist), ("cifar_inn", load_cifar), ("celeba_inn", load_celeba)],
 )
-def test_Trainer_inn(modelname, load_data):
+def test_trainer_inn(modelname, load_data):
     hyp_dict = HYPERPARAMETER[modelname]
     hyp_dict["num_epoch"] = 3
     hyp_dict["milestones"] = [2]
@@ -124,11 +124,10 @@ def test_Trainer_inn(modelname, load_data):
         ("mnist_classicDeep1024", load_mnist),
         ("mnist_classic2048", load_mnist),
         ("cifar_classic", load_cifar),
-        ("cifar_classic", load_cifar),
         ("celeba_classic", load_celeba),
     ],
 )
-def test_Trainer_classic(modelname, load_data):
+def test_trainer_classic(modelname, load_data):
     hyp_dict = HYPERPARAMETER[modelname]
     hyp_dict["num_epoch"] = 3
     hyp_dict["milestones"] = [2]

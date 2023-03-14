@@ -24,7 +24,7 @@ from src.dataloader import get_loader, load_celeba, load_cifar, load_mnist
         MNISTAutoencoder2048,
     ],
 )
-def test_MNISTAutoencoder(autoencoder):
+def test_mnist_autoencoder(autoencoder):
     trainset, testset = load_mnist()
     trainloader = get_loader(trainset, 2, True)
     testloader = get_loader(testset, 2, False)
@@ -47,7 +47,7 @@ def test_MNISTAutoencoder(autoencoder):
     assert out_test.size() == (2, 1, 28, 28)
 
 
-def test_MNIST_INN_Autoencoder():
+def test_mnist_inn_autoencoder():
     trainset, testset = load_mnist()
     trainloader = get_loader(trainset, 2, True)
     testloader = get_loader(testset, 2, False)
@@ -78,7 +78,7 @@ def test_MNIST_INN_Autoencoder():
     assert out_test.size() == (2, 1, 28, 28)
 
 
-def test_CIFAR10Autoencoder():
+def test_cifar_autoencoder():
     trainset, testset = load_cifar()
     trainloader = get_loader(trainset, 2, True)
     testloader = get_loader(testset, 2, False)
@@ -101,7 +101,7 @@ def test_CIFAR10Autoencoder():
     assert out_test.size() == (2, 3, 32, 32)
 
 
-def test_CIFAR_INN_Autoencoder():
+def test_cifar_inn_autoencoder():
     trainset, testset = load_cifar()
     trainloader = get_loader(trainset, 2, True)
     testloader = get_loader(testset, 2, False)
@@ -132,7 +132,7 @@ def test_CIFAR_INN_Autoencoder():
     assert out_test.size() == (2, 3, 32, 32)
 
 
-def test_CelebAAutoencoder():
+def test_celeba_autoencoder():
     trainset, testset = load_celeba(resize=False)
     trainloader = get_loader(trainset, 2, True)
     testloader = get_loader(testset, 2, False)
@@ -155,7 +155,7 @@ def test_CelebAAutoencoder():
     assert out_test.size() == (2, 3, 218, 178)
 
 
-def test_CelebA_INN_Autoencoder():
+def test_celeba_inn_autoencoder():
     trainset, testset = load_celeba(resize=True)
     trainloader = get_loader(trainset, 2, True)
     testloader = get_loader(testset, 2, False)
