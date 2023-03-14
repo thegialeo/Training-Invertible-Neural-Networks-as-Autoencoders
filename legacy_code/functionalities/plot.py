@@ -27,7 +27,7 @@ def plot(x, y, x_label, y_label, plot_label, title, filename, sub_dim=None, figs
     :param font_size: font size of labels
     :return: None
     """
-    
+
     plt.rcParams.update({'font.size': font_size})
 
     if not ('numpy' in str(type(x))):
@@ -89,8 +89,8 @@ def plot(x, y, x_label, y_label, plot_label, title, filename, sub_dim=None, figs
                 counter += 1
 
     plt.tight_layout()
-    
-   
+
+
 
     subdir = "./plot"
     if not os.path.exists(subdir):
@@ -193,8 +193,8 @@ def plot_diff(model, loader, latent_dim, device='cpu', num_img=1, grid_row_size=
     print("Difference:")
     imshow(torchvision.utils.make_grid(diff_img[:num_img].detach(), grid_row_size), figsize,
            filename + "_difference" if (filename is not None) else None)
-    
-    
+
+
 def plot_diff_all(get_model, modelname, num_epoch, loader, latent_dim_lst, device='cpu', num_img=1, grid_row_size=10, figsize=(30, 30), filename=None, conditional=False):
     """
     Plot original images, reconstructed images by the INN and the difference between those images for all latent dimensions given in latent_dim_lst.
@@ -210,7 +210,7 @@ def plot_diff_all(get_model, modelname, num_epoch, loader, latent_dim_lst, devic
     """
     for lat_dim in latent_dim_lst:
         print("Latent Dimension: ", lat_dim)
-        try: 
+        try:
             model = fm.load_model('{}_{}_{}'.format(modelname, lat_dim, num_epoch), "{}_bottleneck".format(modelname))
             plot_diff(model, loader, lat_dim, device, num_img, grid_row_size, filename='{}_{}'.format(modelname, lat_dim))
         except:
@@ -390,24 +390,24 @@ def plot_all_traversals_grid(model, latent_dim, input_size, input_shape, num_sam
     :param filename: file name under which the plot will be saved. (optional)
     :return: None
     """
-        
+
     model.to(device)
     model.eval()
-    
+
     if len(input_shape) != 3:
         raise ValueError("input_shape must be 3-dimensional")
-       
 
-    grid = []    
+
+    grid = []
     for idx in range(latent_dim):
         latent_samples = tra.traverse_continous_line(latent_dim, input_size, idx, num_sample, False, lat_img=None, conditional_target=conditional_target)
-        
+
         latent_samples = latent_samples.view(num_sample, input_shape[0], input_shape[1], input_shape[2])
 
         generate = model(latent_samples.to(device), rev=True)
-        
+
         grid.append(generate)
-    
+
     grid = torch.cat(grid)
 
     imshow(torchvision.utils.make_grid(grid.detach(), num_sample), figsize, filename if (filename is not None) else None)
@@ -471,9 +471,3 @@ def to_img(x, size):
     x = x.clamp(0, 1)
     x = x.view(x.size(0), size[0], size[1], size[2])
     return x
-
-
-
-
-
-

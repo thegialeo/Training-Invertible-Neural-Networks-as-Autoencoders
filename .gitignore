@@ -127,6 +127,9 @@ cython_debug/
 
 # custom folders
 datasets/
+logs/
+models/
+plots/
 
 # VSCode
 .vscode

@@ -10,11 +10,10 @@ from src.trainer import Trainer
 
 
 @pytest.mark.parametrize(
-    "test_cases",
+    "modelname, load_data",
     [("mnist_inn", load_mnist), ("cifar_inn", load_cifar), ("celeba_inn", load_celeba)],
 )
-def test_Trainer_inn(test_cases):
-    modelname, load_data = test_cases
+def test_Trainer_inn(modelname, load_data):
     hyp_dict = HYPERPARAMETER[modelname]
     hyp_dict["num_epoch"] = 3
     hyp_dict["milestones"] = [2]
@@ -118,7 +117,7 @@ def test_Trainer_inn(test_cases):
 
 
 @pytest.mark.parametrize(
-    "test_cases",
+    "modelname, load_data",
     [
         ("mnist_classic", load_mnist),
         ("mnist_classic1024", load_mnist),
@@ -129,8 +128,7 @@ def test_Trainer_inn(test_cases):
         ("celeba_classic", load_celeba),
     ],
 )
-def test_Trainer_classic(test_cases):
-    modelname, load_data = test_cases
+def test_Trainer_classic(modelname, load_data):
     hyp_dict = HYPERPARAMETER[modelname]
     hyp_dict["num_epoch"] = 3
     hyp_dict["milestones"] = [2]

@@ -94,3 +94,20 @@ def get_loader(
         dataset, batch_size=batch_size, shuffle=shuffle, pin_memory=True, drop_last=True
     )
     return loader
+
+
+# ---------------------------------------------------------------------------- #
+#                                  Entry Point                                 #
+# ---------------------------------------------------------------------------- #
+
+DATASET = {
+    "mnist_inn": load_mnist(),
+    "cifar_inn": load_cifar(),
+    "celeba_inn": load_celeba(True),
+    "mnist_classic": load_mnist(),
+    "mnist_classic1024": load_mnist(),
+    "mnist_classicDeep1024": load_mnist(),
+    "mnist_classic2048": load_mnist(),
+    "cifar_classic": load_cifar(),
+    "celeba_classic": load_celeba(False),
+}

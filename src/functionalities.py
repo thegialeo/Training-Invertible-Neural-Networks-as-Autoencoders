@@ -6,6 +6,7 @@ Functions:
     init_weigths(nn.Module) -> None: initialize model weights
     get_model(int, str, dict) -> nn.Module: initialize and returns model
     get_optimizer(nn.Module, dict) -> torch.optimizer: initialize and returns optimizer
+    plot_image(torch.Tensor, str, str) -> None: plot the torch tensor image
 """
 
 import os
