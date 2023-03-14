@@ -61,3 +61,17 @@ class Experiment:
 
     def run_classic_experiment(self) -> None:
         """Run classic autoencoder bottleneck experiment."""
+        for idx, lat_dim in enumerate(cast(list[int], self.hyp_dict["lat_dim_lst"])):
+            print("\n")
+            print(f"Start Training with latent dimension: {lat_dim}")
+            print("\n")
+
+            trainer = Trainer(lat_dim, self.modelname, self.hyp_dict)
+            trainer.train_classic(self.trainloader)
+
+            train_loss = trainer.evaluate_classic(self.trainloader)
+            test_loss = trainer.evaluate_classic(self.testloader)
+            self.bottleneck_loss["train"][idx] = train_loss
+            self.bottleneck_loss["test"][idx] = test_loss
+
+            trainer.plot_classic(self.testloader, 100, 10, "latent dimension {lat_dim}")
