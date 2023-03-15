@@ -25,6 +25,7 @@ class Experiment:
     Methods:
         run_inn_experiment() -> None: run bottleneck experiment for INN autoencoder
         run_classic_experiment() -> None: run bottleneck experiment for classic autoencoder
+        get_loss() -> dict: return train and test loss for all bottlenecks
     """
 
     def __init__(self, modelname: str) -> None:
@@ -47,6 +48,14 @@ class Experiment:
         self.testloader = get_loader(
             testset, cast(int, self.hyp_dict["batch_size"]), False
         )
+
+    def get_loss(self) -> dict:
+        """Return train and test loss for all bottleneck sizes.
+
+        Returns:
+            bottleneck_loss (dict): train and test loss for different bottleneck sizes
+        """
+        return self.bottleneck_loss
 
     def run_inn_experiment(self) -> None:
         """Run INN autoencoder bottleneck experiment."""

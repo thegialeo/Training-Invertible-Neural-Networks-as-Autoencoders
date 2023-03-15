@@ -19,14 +19,16 @@ def test_experiment_inn(modelname):
         torch.utils.data.Subset(testset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, False
     )
     experiment.run_inn_experiment()
-    assert torch.sum(experiment.bottleneck_loss["train"] > 0) == 2
-    assert (
-        experiment.bottleneck_loss["train"][0] != experiment.bottleneck_loss["train"][1]
-    )
-    assert torch.sum(experiment.bottleneck_loss["test"] > 0) == 2
-    assert (
-        experiment.bottleneck_loss["test"][0] != experiment.bottleneck_loss["test"][1]
-    )
+    loss = experiment.get_loss()
+    assert isinstance(loss, dict)
+    assert isinstance(loss["train"], torch.Tensor)
+    assert isinstance(loss["test"], torch.Tensor)
+    assert torch.equal(loss["train"], experiment.bottleneck_loss["train"])
+    assert torch.equal(loss["test"], experiment.bottleneck_loss["test"])
+    assert torch.sum(loss["train"] > 0) == 2
+    assert loss["train"][0] != loss["train"][1]
+    assert torch.sum(loss["test"] > 0) == 2
+    assert loss["test"][0] != loss["test"][1]
 
 
 @pytest.mark.parametrize(
@@ -53,11 +55,13 @@ def test_experiment_classic(modelname):
         torch.utils.data.Subset(testset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, False
     )
     experiment.run_classic_experiment()
-    assert torch.sum(experiment.bottleneck_loss["train"] > 0) == 2
-    assert (
-        experiment.bottleneck_loss["train"][0] != experiment.bottleneck_loss["train"][1]
-    )
-    assert torch.sum(experiment.bottleneck_loss["test"] > 0) == 2
-    assert (
-        experiment.bottleneck_loss["test"][0] != experiment.bottleneck_loss["test"][1]
-    )
+    loss = experiment.get_loss()
+    assert isinstance(loss, dict)
+    assert isinstance(loss["train"], torch.Tensor)
+    assert isinstance(loss["test"], torch.Tensor)
+    assert torch.equal(loss["train"], experiment.bottleneck_loss["train"])
+    assert torch.equal(loss["test"], experiment.bottleneck_loss["test"])
+    assert torch.sum(loss["train"] > 0) == 2
+    assert loss["train"][0] != loss["train"][1]
+    assert torch.sum(loss["test"] > 0) == 2
+    assert loss["test"][0] != loss["test"][1]
