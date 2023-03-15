@@ -19,6 +19,12 @@ class Experiment:
         modelname: name of the model to run experiments
         hyp_dict (dict): collection of hyperparameters
         bottleneck_loss (dict): train and test loss for different bottleneck sizes
+        trainloader: dataloader for trainset
+        testloader: dataloader for testset
+
+    Methods:
+        run_inn_experiment() -> None: run bottleneck experiment for INN autoencoder
+        run_classic_experiment() -> None: run bottleneck experiment for classic autoencoder
     """
 
     def __init__(self, modelname: str) -> None:
