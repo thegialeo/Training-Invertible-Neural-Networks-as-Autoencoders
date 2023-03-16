@@ -61,7 +61,7 @@ class Trainer:
 
         Args:
             trainloader (torch.utils.data.DataLoader): dataloader for training.
-            subdir (str): subdirectory to save the model. Defaults to None.
+            subdir (str): subdirectory to save the model. Defaults to "".
         """
         print(f"Start training for latent dimension: {self.lat_dim}")
 
@@ -147,7 +147,7 @@ class Trainer:
 
         Args:
             trainloader (torch.utils.data.DataLoader): dataloader for training.
-            subdir (str): subdirectory to save the model. Defaults to None.
+            subdir (str): subdirectory to save the model. Defaults to "".
         """
         # pylint: disable=W0107
         print(f"Start training for latent dimension: {self.lat_dim}")

@@ -98,13 +98,13 @@ def test_trainer_inn(modelname, load_data):
     assert os.path.exists(os.path.join("plots", "pytest"))
     if not os.listdir(os.path.join("models", "pytest")):
         os.rmdir(os.path.join("models", "pytest"))
-        assert not os.path.exists(os.path.join("models", "pytest"))
     if not os.listdir(os.path.join("logs", "pytest")):
         os.rmdir(os.path.join("logs", "pytest"))
-        assert not os.path.exists(os.path.join("logs", "pytest"))
     if not os.listdir(os.path.join("plots", "pytest")):
         os.rmdir(os.path.join("plots", "pytest"))
-        assert not os.path.exists(os.path.join("plots", "pytest"))
+    assert not os.path.exists(os.path.join("models", "pytest"))
+    assert not os.path.exists(os.path.join("logs", "pytest"))
+    assert not os.path.exists(os.path.join("plots", "pytest"))
     if not os.listdir("models"):
         os.rmdir(os.path.join("models"))
         assert not os.path.exists(os.path.join("models"))
@@ -193,13 +193,13 @@ def test_trainer_classic(modelname, load_data):
     assert os.path.exists(os.path.join("plots", "pytest"))
     if not os.listdir(os.path.join("models", "pytest")):
         os.rmdir(os.path.join("models", "pytest"))
-        assert not os.path.exists(os.path.join("models", "pytest"))
     if not os.listdir(os.path.join("logs", "pytest")):
         os.rmdir(os.path.join("logs", "pytest"))
-        assert not os.path.exists(os.path.join("logs", "pytest"))
     if not os.listdir(os.path.join("plots", "pytest")):
         os.rmdir(os.path.join("plots", "pytest"))
-        assert not os.path.exists(os.path.join("plots", "pytest"))
+    assert not os.path.exists(os.path.join("models", "pytest"))
+    assert not os.path.exists(os.path.join("logs", "pytest"))
+    assert not os.path.exists(os.path.join("plots", "pytest"))
     if not os.listdir("models"):
         os.rmdir(os.path.join("models"))
         assert not os.path.exists(os.path.join("models"))
