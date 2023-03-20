@@ -4,7 +4,7 @@ Classes:
     Experiment: Run experiments in the paper
 """
 import os
-from typing import cast
+from typing import Union, cast
 
 import torch
 
@@ -39,10 +39,16 @@ class Experiment:
         """
         self.modelname = modelname
         self.subdir = subdir
-        self.hyp_dict = HYPERPARAMETER[modelname]
+        self.hyp_dict: dict[Union[list[int], str]] = HYPERPARAMETER[modelname]
         self.bottleneck_loss = {
-            "train": torch.zeros(len(cast(list[int], self.hyp_dict["lat_dim_lst"]))),
-            "test": torch.zeros(len(cast(list[int], self.hyp_dict["lat_dim_lst"]))),
+            "train": torch.zeros(
+                len(self.hyp_dict["lat_dim_lst"]),
+                dtype=self.hyp_dict["dtype"],
+            ),
+            "test": torch.zeros(
+                len(self.hyp_dict["lat_dim_lst"]),
+                dtype=self.hyp_dict["dtype"],
+            ),
         }
 
         trainset, testset = DATASET[self.modelname]

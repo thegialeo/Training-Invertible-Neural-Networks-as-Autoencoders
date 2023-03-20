@@ -1,5 +1,7 @@
+import math
 import os
 
+import numpy as np
 import pytest
 import torch
 import torchvision.models as models
@@ -13,6 +15,7 @@ from src.functionalities import (
     get_model,
     get_optimizer,
     init_weights,
+    plot_curves,
     plot_image,
 )
 from src.settings import HYPERPARAMETER
@@ -130,6 +133,36 @@ def test_plot_image_celeba_folder(resize):
     img, _ = trainset[0]
     plot_image(img, "test", "pytest")
     assert isinstance(img, torch.Tensor)
+    assert os.path.exists(os.path.join("plots", "pytest", "test.png"))
+    delete_file("plots", "test.png", "pytest")
+    assert not os.path.exists(os.path.join("plots", "pytest", "test.png"))
+    assert os.path.exists(os.path.join("plots", "pytest"))
+    os.rmdir(os.path.join("plots", "pytest"))
+    assert not os.path.exists(os.path.join("plots", "pytest"))
+    assert os.path.exists("plots")
+    if not os.listdir("plots"):
+        os.rmdir("plots")
+        assert not os.path.exists("plots")
+
+
+def test_plot_curves():
+    x = [x for x in np.arange(0, 12, 0.1)]
+    y_sin = torch.zeros(len(x))
+    y_cos = torch.zeros(len(x))
+
+    for i, x_i in enumerate(x):
+        y_sin[i] = math.sin(x_i)
+        y_cos[i] = math.cos(x_i)
+
+    plot_settings = {
+        "names": ["sine", "cosine"],
+        "x_label": "angle",
+        "y_label": "function",
+        "title": "Sine and Cosine Functions",
+    }
+
+    plot_curves(x, [y_sin, y_cos], "test", plot_settings, "pytest")
+
     assert os.path.exists(os.path.join("plots", "pytest", "test.png"))
     delete_file("plots", "test.png", "pytest")
     assert not os.path.exists(os.path.join("plots", "pytest", "test.png"))

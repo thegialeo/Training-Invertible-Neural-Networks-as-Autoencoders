@@ -7,10 +7,11 @@ Functions:
     get_model(int, str, dict) -> nn.Module: initialize and returns model
     get_optimizer(nn.Module, dict) -> torch.optimizer: initialize and returns optimizer
     plot_image(torch.Tensor, str, str) -> None: plot the torch tensor image
+    plot_curves(list, list[Tensor], str, dict, str) -> None: plot curves
 """
 
 import os
-from typing import cast
+from typing import Union, cast
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -117,7 +118,7 @@ def get_optimizer(model: torch.nn.Module, hyp_dict: dict) -> torch.optim.Optimiz
     return optimizer
 
 
-def plot_image(img: torch.Tensor, filename: str, folder="") -> None:
+def plot_image(img: torch.Tensor, filename: str, folder: str = "") -> None:
     """Plot and save torch tensors representing images.
 
     Args:
@@ -137,7 +138,52 @@ def plot_image(img: torch.Tensor, filename: str, folder="") -> None:
     create_folder(path)
 
     plt.savefig(
-        os.path.join(path, filename) + ".png",
+        os.path.join(path, filename + ".png"),
+        transparent=True,
+        bbox_inches="tight",
+        pad_inches=0,
+    )
+
+
+def plot_curves(
+    xdata: list[Union[int, float]],
+    ydata: list[torch.Tensor],
+    filename: str,
+    plot_setting: dict,
+    folder: str = "",
+) -> None:
+    """Plot curves.
+
+    Args:
+        xdata (list): x-axis data
+        ydata (torch.Tensor): y-axis data
+        filename (str): Filename to save the image
+        plot_setting (dict): plot settings
+        folder (str): The folder to save the file in. Defaults to "".
+    """
+    plt.rcParams.update({"font.size": 24})
+
+    fig, axes = plt.subplots(1, 1, figsize=(15, 10))
+
+    for idx, y_curve in enumerate(ydata):
+        axes.plot(xdata, y_curve, label=plot_setting["names"][idx])
+
+    axes.set_xlabel(plot_setting["x_label"])
+    axes.set_ylabel(plot_setting["y_label"])
+    axes.set_title(plot_setting["title"])
+    axes.grid(True)
+    axes.legend()
+
+    plt.tight_layout()
+
+    subdir = "plots"
+    path = os.path.join(subdir, folder) if folder else subdir
+
+    create_folder(subdir)
+    create_folder(path)
+
+    fig.savefig(
+        os.path.join(path, filename + ".png"),
         transparent=True,
         bbox_inches="tight",
         pad_inches=0,
