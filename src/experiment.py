@@ -9,7 +9,6 @@ from typing import cast
 import torch
 
 from src.dataloader import DATASET, get_loader
-from src.filemanager import create_folder
 from src.settings import HYPERPARAMETER
 from src.trainer import Trainer
 
@@ -45,9 +44,6 @@ class Experiment:
             "train": torch.zeros(len(cast(list[int], self.hyp_dict["lat_dim_lst"]))),
             "test": torch.zeros(len(cast(list[int], self.hyp_dict["lat_dim_lst"]))),
         }
-
-        if subdir:
-            create_folder(subdir)
 
         trainset, testset = DATASET[self.modelname]
         self.trainloader = get_loader(
