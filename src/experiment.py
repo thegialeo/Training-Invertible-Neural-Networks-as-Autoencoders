@@ -12,6 +12,7 @@ from typing import cast
 import torch
 
 from src.dataloader import DATASET, get_loader
+from src.filemanager import save_numpy
 from src.settings import HYPERPARAMETER
 from src.trainer import Trainer
 
@@ -62,16 +63,16 @@ class Experiment:
             testset, cast(int, self.hyp_dict["batch_size"]), False
         )
 
-    def get_loss(self, key: str) -> torch.Tensor:
+    def get_loss(self, mode: str) -> torch.Tensor:
         """Return train and test loss for all bottleneck sizes.
 
         Args:
-            key (str): dictionary key. Options: 'train' and 'test'
+            mode (str): return train or test loss. Options: "train", "test".
 
         Returns:
             bottleneck_loss (torch.Tensor): train and test loss for different bottleneck sizes
         """
-        return self.bottleneck_loss[key]
+        return self.bottleneck_loss[mode]
 
     def get_lat_dim_lst(self) -> list:
         """Return list of bottleneck dimensions used in the experiments.
@@ -88,6 +89,18 @@ class Experiment:
             self.run_inn_experiment()
         else:
             self.run_classic_experiment()
+
+        save_numpy(
+            self.bottleneck_loss["train"].cpu().detach().numpy(),
+            self.modelname + "_bottleneck_train_loss",
+            self.subdir,
+        )
+
+        save_numpy(
+            self.bottleneck_loss["test"].cpu().detach().numpy(),
+            self.modelname + "_bottleneck_test_loss",
+            self.subdir,
+        )
 
     def run_inn_experiment(self) -> None:
         """Run INN autoencoder bottleneck experiment."""

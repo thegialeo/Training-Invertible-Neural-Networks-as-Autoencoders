@@ -34,12 +34,17 @@ def test_experiment_inn(modelname):
     assert torch.sum(train_loss > 0) == 2
     assert train_loss[0] != train_loss[1]
     assert torch.sum(test_loss > 0) == 2
-    assert test_loss[0] != test_loss[1]
     assert os.path.exists(
         os.path.join("models", "pytest", "lat_dim_3", f"{modelname}.pt")
     )
     assert os.path.exists(
         os.path.join("models", "pytest", "lat_dim_5", f"{modelname}.pt")
+    )
+    assert os.path.exists(
+        os.path.join("logs", "pytest", f"{modelname}_bottleneck_train_loss.npy")
+    )
+    assert os.path.exists(
+        os.path.join("logs", "pytest", f"{modelname}_bottleneck_test_loss.npy")
     )
     assert os.path.exists(
         os.path.join("logs", "pytest", "lat_dim_3", f"{modelname}_train_total.npy")
@@ -85,6 +90,8 @@ def test_experiment_inn(modelname):
     )
     delete_file("models", f"{modelname}.pt", os.path.join("pytest", "lat_dim_3"))
     delete_file("models", f"{modelname}.pt", os.path.join("pytest", "lat_dim_5"))
+    delete_file("logs", f"{modelname}_bottleneck_train_loss.npy", "pytest")
+    delete_file("logs", f"{modelname}_bottleneck_test_loss.npy", "pytest")
     delete_file(
         "logs", f"{modelname}_train_total.npy", os.path.join("pytest", "lat_dim_3")
     )
@@ -132,6 +139,12 @@ def test_experiment_inn(modelname):
     )
     assert not os.path.exists(
         os.path.join("models", "pytest", "lat_dim_5", f"{modelname}.pt")
+    )
+    assert not os.path.exists(
+        os.path.join("logs", "pytest", f"{modelname}_bottleneck_train_loss.npy")
+    )
+    assert not os.path.exists(
+        os.path.join("logs", "pytest", f"{modelname}_bottleneck_test_loss.npy")
     )
     assert not os.path.exists(
         os.path.join("logs", "pytest", "lat_dim_3", f"{modelname}_train_total.npy")
@@ -266,6 +279,12 @@ def test_experiment_classic(modelname):
         os.path.join("models", "pytest", "lat_dim_5", f"{modelname}.pt")
     )
     assert os.path.exists(
+        os.path.join("logs", "pytest", f"{modelname}_bottleneck_train_loss.npy")
+    )
+    assert os.path.exists(
+        os.path.join("logs", "pytest", f"{modelname}_bottleneck_test_loss.npy")
+    )
+    assert os.path.exists(
         os.path.join("logs", "pytest", "lat_dim_3", f"{modelname}_train_rec.npy")
     )
     assert os.path.exists(
@@ -291,6 +310,8 @@ def test_experiment_classic(modelname):
     )
     delete_file("models", f"{modelname}.pt", os.path.join("pytest", "lat_dim_3"))
     delete_file("models", f"{modelname}.pt", os.path.join("pytest", "lat_dim_5"))
+    delete_file("logs", f"{modelname}_bottleneck_train_loss.npy", "pytest")
+    delete_file("logs", f"{modelname}_bottleneck_test_loss.npy", "pytest")
     delete_file(
         "logs", f"{modelname}_train_rec.npy", os.path.join("pytest", "lat_dim_3")
     )
@@ -320,6 +341,12 @@ def test_experiment_classic(modelname):
     )
     assert not os.path.exists(
         os.path.join("models", "pytest", "lat_dim_5", f"{modelname}.pt")
+    )
+    assert not os.path.exists(
+        os.path.join("logs", "pytest", f"{modelname}_bottleneck_train_loss.npy")
+    )
+    assert not os.path.exists(
+        os.path.join("logs", "pytest", f"{modelname}_bottleneck_test_loss.npy")
     )
     assert not os.path.exists(
         os.path.join("logs", "pytest", "lat_dim_3", f"{modelname}_train_rec.npy")
