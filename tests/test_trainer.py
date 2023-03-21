@@ -3,25 +3,22 @@ import os
 import pytest
 import torch
 
-from src.dataloader import get_loader, load_celeba, load_cifar, load_mnist
+from src.dataloader import DATASET, get_loader
 from src.filemanager import delete_file
 from src.settings import HYPERPARAMETER
 from src.trainer import Trainer
 
 
 @pytest.mark.parametrize(
-    "modelname, load_data",
-    [("mnist_inn", load_mnist), ("cifar_inn", load_cifar), ("celeba_inn", load_celeba)],
+    "modelname",
+    ["mnist_inn", "cifar_inn", "celeba_inn"],
 )
-def test_trainer_inn(modelname, load_data):
+def test_trainer_inn(modelname):
     hyp_dict = HYPERPARAMETER[modelname]
     hyp_dict["num_epoch"] = 3
     hyp_dict["milestones"] = [2]
     trainer = Trainer(5, modelname, hyp_dict)
-    if modelname == "celeba_inn":
-        trainset, _ = load_data(True)
-    else:
-        trainset, _ = load_data()
+    trainset, _ = DATASET[modelname]
     trainloader = get_loader(
         torch.utils.data.Subset(trainset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, True
     )
@@ -117,25 +114,22 @@ def test_trainer_inn(modelname, load_data):
 
 
 @pytest.mark.parametrize(
-    "modelname, load_data",
+    "modelname",
     [
-        ("mnist_classic", load_mnist),
-        ("mnist_classic1024", load_mnist),
-        ("mnist_classicDeep1024", load_mnist),
-        ("mnist_classic2048", load_mnist),
-        ("cifar_classic", load_cifar),
-        ("celeba_classic", load_celeba),
+        "mnist_classic",
+        "mnist_classic1024",
+        "mnist_classicDeep1024",
+        "mnist_classic2048",
+        "cifar_classic",
+        "celeba_classic",
     ],
 )
-def test_trainer_classic(modelname, load_data):
+def test_trainer_classic(modelname):
     hyp_dict = HYPERPARAMETER[modelname]
     hyp_dict["num_epoch"] = 3
     hyp_dict["milestones"] = [2]
     trainer = Trainer(5, modelname, hyp_dict)
-    if modelname == "celeba_classic":
-        trainset, _ = load_data(False)
-    else:
-        trainset, _ = load_data()
+    trainset, _ = DATASET[modelname]
     trainloader = get_loader(
         torch.utils.data.Subset(trainset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, True
     )
