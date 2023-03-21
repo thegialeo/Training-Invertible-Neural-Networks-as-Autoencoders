@@ -707,13 +707,13 @@ def get_celeba_inn_autoencoder() -> nn.Module:
 #                                 Entry Points                                 #
 # ---------------------------------------------------------------------------- #
 
-INN_ARCHITECTURES = {
+EXPERIMENT_INN_ARCHITECTURES = {
     "mnist_inn": get_mnist_inn_autoencoder,
     "cifar_inn": get_cifar10_inn_autoencoder,
     "celeba_inn": get_celeba_inn_autoencoder,
 }
 
-CLASSIC_ARCHITECTURES = {
+EXPERIMENT_CLASSIC_ARCHITECTURES = {
     "mnist_classic": MNISTAutoencoder,
     "mnist_classic1024": MNISTAutoencoder1024,
     "mnist_classicDeep1024": MNISTAutoencoderDeep1024,
@@ -721,3 +721,18 @@ CLASSIC_ARCHITECTURES = {
     "cifar_classic": CIFAR10Autoencoder,
     "celeba_classic": CelebAAutoencoder,
 }
+
+PYTEST_ARCHITECTURES = {
+    "pytest_mnist_inn": get_mnist_inn_autoencoder,
+    "pytest_cifar_inn": get_cifar10_inn_autoencoder,
+    "pytest_celeba_inn": get_celeba_inn_autoencoder,
+    "pytest_mnist_classic": MNISTAutoencoder,
+    "pytest_mnist_classic1024": MNISTAutoencoder1024,
+    "pytest_mnist_classicDeep1024": MNISTAutoencoderDeep1024,
+    "pytest_mnist_classic2048": MNISTAutoencoder2048,
+    "pytest_cifar_classic": CIFAR10Autoencoder,
+    "pytest_celeba_classic": CelebAAutoencoder,
+}
+
+INN_ARCHITECTURES = dict(EXPERIMENT_INN_ARCHITECTURES, **PYTEST_ARCHITECTURES)
+CLASSIC_ARCHITECTURES = dict(EXPERIMENT_CLASSIC_ARCHITECTURES, **PYTEST_ARCHITECTURES)

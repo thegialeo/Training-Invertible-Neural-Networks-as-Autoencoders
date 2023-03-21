@@ -100,7 +100,7 @@ def get_loader(
 #                                  Entry Point                                 #
 # ---------------------------------------------------------------------------- #
 
-DATASET = {
+EXPERIMENT_DATASET = {
     "mnist_inn": load_mnist(),
     "cifar_inn": load_cifar(),
     "celeba_inn": load_celeba(True),
@@ -111,3 +111,17 @@ DATASET = {
     "cifar_classic": load_cifar(),
     "celeba_classic": load_celeba(False),
 }
+
+PYTEST_DATASET = {
+    "pytest_mnist_inn": load_mnist(),
+    "pytest_cifar_inn": load_cifar(),
+    "pytest_celeba_inn": load_celeba(True),
+    "pytest_mnist_classic": load_mnist(),
+    "pytest_mnist_classic1024": load_mnist(),
+    "pytest_mnist_classicDeep1024": load_mnist(),
+    "pytest_mnist_classic2048": load_mnist(),
+    "pytest_cifar_classic": load_cifar(),
+    "pytest_celeba_classic": load_celeba(False),
+}
+
+DATASET = dict(EXPERIMENT_DATASET, **PYTEST_DATASET)

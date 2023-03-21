@@ -4,23 +4,15 @@ import pytest
 import torch
 
 from src.dataloader import DATASET, get_loader
-from src.experiment import Experiment
+from src.experiment import Experiment, experiment_wrapper
 from src.filemanager import delete_file
 
 
-@pytest.mark.parametrize("modelname", ["mnist_inn", "cifar_inn", "celeba_inn"])
+@pytest.mark.parametrize(
+    "modelname", ["pytest_mnist_inn", "pytest_cifar_inn", "pytest_celeba_inn"]
+)
 def test_experiment_inn(modelname):
     experiment = Experiment(modelname, "pytest")
-    experiment.hyp_dict["num_epoch"] = 3
-    experiment.hyp_dict["milestones"] = [2]
-    experiment.hyp_dict["lat_dim_lst"] = [3, 5]
-    trainset, testset = DATASET[modelname]
-    experiment.trainloader = get_loader(
-        torch.utils.data.Subset(trainset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, True
-    )
-    experiment.testloader = get_loader(
-        torch.utils.data.Subset(testset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, False
-    )
     experiment.run_experiment()
     lat_dim_lst = experiment.get_lat_dim_lst()
     train_loss = experiment.get_loss("train")
@@ -238,12 +230,12 @@ def test_experiment_inn(modelname):
 @pytest.mark.parametrize(
     "modelname",
     [
-        "mnist_classic",
-        "mnist_classic1024",
-        "mnist_classicDeep1024",
-        "mnist_classic2048",
-        "cifar_classic",
-        "celeba_classic",
+        "pytest_mnist_classic",
+        "pytest_mnist_classic1024",
+        "pytest_mnist_classicDeep1024",
+        "pytest_mnist_classic2048",
+        "pytest_cifar_classic",
+        "pytest_celeba_classic",
     ],
 )
 def test_experiment_classic(modelname):
@@ -372,6 +364,284 @@ def test_experiment_classic(modelname):
     assert not os.path.exists(
         os.path.join("plots", "pytest", "lat_dim_5", f"{modelname}_difference.png")
     )
+    assert os.path.exists(os.path.join("models", "pytest", "lat_dim_3"))
+    assert os.path.exists(os.path.join("models", "pytest", "lat_dim_5"))
+    assert os.path.exists(os.path.join("logs", "pytest", "lat_dim_3"))
+    assert os.path.exists(os.path.join("logs", "pytest", "lat_dim_5"))
+    assert os.path.exists(os.path.join("plots", "pytest", "lat_dim_3"))
+    assert os.path.exists(os.path.join("plots", "pytest", "lat_dim_5"))
+    if not os.listdir(os.path.join("models", "pytest", "lat_dim_3")):
+        os.rmdir(os.path.join("models", "pytest", "lat_dim_3"))
+    if not os.listdir(os.path.join("models", "pytest", "lat_dim_5")):
+        os.rmdir(os.path.join("models", "pytest", "lat_dim_5"))
+    if not os.listdir(os.path.join("logs", "pytest", "lat_dim_3")):
+        os.rmdir(os.path.join("logs", "pytest", "lat_dim_3"))
+    if not os.listdir(os.path.join("logs", "pytest", "lat_dim_5")):
+        os.rmdir(os.path.join("logs", "pytest", "lat_dim_5"))
+    if not os.listdir(os.path.join("plots", "pytest", "lat_dim_3")):
+        os.rmdir(os.path.join("plots", "pytest", "lat_dim_3"))
+    if not os.listdir(os.path.join("plots", "pytest", "lat_dim_5")):
+        os.rmdir(os.path.join("plots", "pytest", "lat_dim_5"))
+    assert not os.path.exists(os.path.join("models", "pytest", "lat_dim_3"))
+    assert not os.path.exists(os.path.join("models", "pytest", "lat_dim_5"))
+    assert not os.path.exists(os.path.join("logs", "pytest", "lat_dim_3"))
+    assert not os.path.exists(os.path.join("logs", "pytest", "lat_dim_5"))
+    assert not os.path.exists(os.path.join("plots", "pytest", "lat_dim_3"))
+    assert not os.path.exists(os.path.join("plots", "pytest", "lat_dim_5"))
+    assert os.path.exists(os.path.join("models", "pytest"))
+    assert os.path.exists(os.path.join("logs", "pytest"))
+    assert os.path.exists(os.path.join("plots", "pytest"))
+    if not os.listdir(os.path.join("models", "pytest")):
+        os.rmdir(os.path.join("models", "pytest"))
+    if not os.listdir(os.path.join("logs", "pytest")):
+        os.rmdir(os.path.join("logs", "pytest"))
+    if not os.listdir(os.path.join("plots", "pytest")):
+        os.rmdir(os.path.join("plots", "pytest"))
+    assert not os.path.exists(os.path.join("models", "pytest"))
+    assert not os.path.exists(os.path.join("logs", "pytest"))
+    assert not os.path.exists(os.path.join("plots", "pytest"))
+    if not os.listdir("models"):
+        os.rmdir(os.path.join("models"))
+        assert not os.path.exists(os.path.join("models"))
+    if not os.listdir("logs"):
+        os.rmdir(os.path.join("logs"))
+        assert not os.path.exists(os.path.join("logs"))
+    if not os.listdir("plots"):
+        os.rmdir(os.path.join("plots"))
+        assert not os.path.exists(os.path.join("plots"))
+
+
+def test_experiment_wrapper():
+    model_lst = [
+        "pytest_mnist_inn",
+        "pytest_cifar_inn",
+        "pytest_celeba_inn",
+        "pytest_mnist_classic",
+        "pytest_mnist_classic1024",
+        "pytest_mnist_classicDeep1024",
+        "pytest_mnist_classic2048",
+        "pytest_cifar_classic",
+        "pytest_celeba_classic",
+    ]
+    lat_dim_lst, train_loss_lst, test_loss_lst = experiment_wrapper(model_lst, "pytest")
+    assert isinstance(lat_dim_lst, list)
+    assert isinstance(train_loss_lst, list)
+    assert isinstance(test_loss_lst, list)
+    assert len(lat_dim_lst) == len(model_lst)
+    assert len(train_loss_lst) == len(model_lst)
+    assert len(test_loss_lst) == len(model_lst)
+    for item in lat_dim_lst:
+        assert item == [3, 5]
+    for train_loss, test_loss in zip(train_loss_lst, test_loss_lst):
+        assert isinstance(train_loss, torch.Tensor)
+        assert isinstance(test_loss, torch.Tensor)
+
+    for inn_modelname in model_lst[:3]:
+        assert os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_3", f"{inn_modelname}_train_total.npy"
+            )
+        )
+        assert os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_3", f"{inn_modelname}_train_dist.npy"
+            )
+        )
+        assert os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_3", f"{inn_modelname}_train_sparse.npy"
+            )
+        )
+        assert os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_5", f"{inn_modelname}_train_total.npy"
+            )
+        )
+        assert os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_5", f"{inn_modelname}_train_dist.npy"
+            )
+        )
+        assert os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_5", f"{inn_modelname}_train_sparse.npy"
+            )
+        )
+        delete_file(
+            "logs",
+            f"{inn_modelname}_train_total.npy",
+            os.path.join("pytest", "lat_dim_3"),
+        )
+        delete_file(
+            "logs",
+            f"{inn_modelname}_train_dist.npy",
+            os.path.join("pytest", "lat_dim_3"),
+        )
+        delete_file(
+            "logs",
+            f"{inn_modelname}_train_sparse.npy",
+            os.path.join("pytest", "lat_dim_3"),
+        )
+        delete_file(
+            "logs",
+            f"{inn_modelname}_train_total.npy",
+            os.path.join("pytest", "lat_dim_5"),
+        )
+        delete_file(
+            "logs",
+            f"{inn_modelname}_train_dist.npy",
+            os.path.join("pytest", "lat_dim_5"),
+        )
+        delete_file(
+            "logs",
+            f"{inn_modelname}_train_sparse.npy",
+            os.path.join("pytest", "lat_dim_5"),
+        )
+        assert not os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_3", f"{inn_modelname}_train_total.npy"
+            )
+        )
+        assert not os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_3", f"{inn_modelname}_train_dist.npy"
+            )
+        )
+        assert not os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_3", f"{inn_modelname}_train_sparse.npy"
+            )
+        )
+        assert not os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_5", f"{inn_modelname}_train_total.npy"
+            )
+        )
+        assert not os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_5", f"{inn_modelname}_train_dist.npy"
+            )
+        )
+        assert not os.path.exists(
+            os.path.join(
+                "logs", "pytest", "lat_dim_5", f"{inn_modelname}_train_sparse.npy"
+            )
+        )
+
+    for modelname in model_lst:
+        assert os.path.exists(
+            os.path.join("models", "pytest", "lat_dim_3", f"{modelname}.pt")
+        )
+        assert os.path.exists(
+            os.path.join("models", "pytest", "lat_dim_5", f"{modelname}.pt")
+        )
+        assert os.path.exists(
+            os.path.join("logs", "pytest", f"{modelname}_bottleneck_train_loss.npy")
+        )
+        assert os.path.exists(
+            os.path.join("logs", "pytest", f"{modelname}_bottleneck_test_loss.npy")
+        )
+        assert os.path.exists(
+            os.path.join("logs", "pytest", "lat_dim_3", f"{modelname}_train_rec.npy")
+        )
+        assert os.path.exists(
+            os.path.join("logs", "pytest", "lat_dim_5", f"{modelname}_train_rec.npy")
+        )
+        assert os.path.exists(
+            os.path.join("plots", "pytest", "lat_dim_3", f"{modelname}_original.png")
+        )
+        assert os.path.exists(
+            os.path.join(
+                "plots", "pytest", "lat_dim_3", f"{modelname}_reconstructed.png"
+            )
+        )
+        assert os.path.exists(
+            os.path.join("plots", "pytest", "lat_dim_3", f"{modelname}_difference.png")
+        )
+        assert os.path.exists(
+            os.path.join("plots", "pytest", "lat_dim_5", f"{modelname}_original.png")
+        )
+        assert os.path.exists(
+            os.path.join(
+                "plots", "pytest", "lat_dim_5", f"{modelname}_reconstructed.png"
+            )
+        )
+        assert os.path.exists(
+            os.path.join("plots", "pytest", "lat_dim_5", f"{modelname}_difference.png")
+        )
+        delete_file("models", f"{modelname}.pt", os.path.join("pytest", "lat_dim_3"))
+        delete_file("models", f"{modelname}.pt", os.path.join("pytest", "lat_dim_5"))
+        delete_file("logs", f"{modelname}_bottleneck_train_loss.npy", "pytest")
+        delete_file("logs", f"{modelname}_bottleneck_test_loss.npy", "pytest")
+        delete_file(
+            "logs", f"{modelname}_train_rec.npy", os.path.join("pytest", "lat_dim_3")
+        )
+        delete_file(
+            "logs", f"{modelname}_train_rec.npy", os.path.join("pytest", "lat_dim_5")
+        )
+        delete_file(
+            "plots", f"{modelname}_original.png", os.path.join("pytest", "lat_dim_3")
+        )
+        delete_file(
+            "plots",
+            f"{modelname}_reconstructed.png",
+            os.path.join("pytest", "lat_dim_3"),
+        )
+        delete_file(
+            "plots", f"{modelname}_difference.png", os.path.join("pytest", "lat_dim_3")
+        )
+        delete_file(
+            "plots", f"{modelname}_original.png", os.path.join("pytest", "lat_dim_5")
+        )
+        delete_file(
+            "plots",
+            f"{modelname}_reconstructed.png",
+            os.path.join("pytest", "lat_dim_5"),
+        )
+        delete_file(
+            "plots", f"{modelname}_difference.png", os.path.join("pytest", "lat_dim_5")
+        )
+        assert not os.path.exists(
+            os.path.join("models", "pytest", "lat_dim_3", f"{modelname}.pt")
+        )
+        assert not os.path.exists(
+            os.path.join("models", "pytest", "lat_dim_5", f"{modelname}.pt")
+        )
+        assert not os.path.exists(
+            os.path.join("logs", "pytest", f"{modelname}_bottleneck_train_loss.npy")
+        )
+        assert not os.path.exists(
+            os.path.join("logs", "pytest", f"{modelname}_bottleneck_test_loss.npy")
+        )
+        assert not os.path.exists(
+            os.path.join("logs", "pytest", "lat_dim_3", f"{modelname}_train_rec.npy")
+        )
+        assert not os.path.exists(
+            os.path.join("logs", "pytest", "lat_dim_5", f"{modelname}_train_rec.npy")
+        )
+        assert not os.path.exists(
+            os.path.join("plots", "pytest", "lat_dim_3", f"{modelname}_original.png")
+        )
+        assert not os.path.exists(
+            os.path.join(
+                "plots", "pytest", "lat_dim_3", f"{modelname}_reconstructed.png"
+            )
+        )
+        assert not os.path.exists(
+            os.path.join("plots", "pytest", "lat_dim_3", f"{modelname}_difference.png")
+        )
+        assert not os.path.exists(
+            os.path.join("plots", "pytest", "lat_dim_5", f"{modelname}_original.png")
+        )
+        assert not os.path.exists(
+            os.path.join(
+                "plots", "pytest", "lat_dim_5", f"{modelname}_reconstructed.png"
+            )
+        )
+        assert not os.path.exists(
+            os.path.join("plots", "pytest", "lat_dim_5", f"{modelname}_difference.png")
+        )
+
     assert os.path.exists(os.path.join("models", "pytest", "lat_dim_3"))
     assert os.path.exists(os.path.join("models", "pytest", "lat_dim_5"))
     assert os.path.exists(os.path.join("logs", "pytest", "lat_dim_3"))

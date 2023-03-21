@@ -56,6 +56,15 @@ class Experiment:
         }
 
         trainset, testset = DATASET[self.modelname]
+
+        if self.hyp_dict["subset"] is not None:
+            trainset = torch.utils.data.Subset(
+                trainset, cast(list[int], self.hyp_dict["subset"])
+            )
+            testset = torch.utils.data.Subset(
+                testset, cast(list[int], self.hyp_dict["subset"])
+            )
+
         self.trainloader = get_loader(
             trainset, cast(int, self.hyp_dict["batch_size"]), True
         )
@@ -151,11 +160,14 @@ class Experiment:
             trainer.plot_classic(self.testloader, 100, 10, save_path)
 
 
-def experiment_wrapper(model_lst: list[str]) -> tuple[list, list, list]:
+def experiment_wrapper(
+    model_lst: list[str], subdir: str = ""
+) -> tuple[list, list, list]:
     """Run experiment wrapper.
 
     Args:
         model_lst: list of model names to run bottleneck experiment
+        subdir (str): subdirectory for saving experiment results. Defaults to "".
 
     Returns:
         lat_dim_lst (list): bottleneck sizes used for each experiment
@@ -167,7 +179,7 @@ def experiment_wrapper(model_lst: list[str]) -> tuple[list, list, list]:
     test_loss_lst = []
 
     for modelname in model_lst:
-        exp = Experiment(modelname)
+        exp = Experiment(modelname, subdir)
         exp.run_experiment()
         lat_dim_lst.append(exp.get_lat_dim_lst())
         train_loss_lst.append(exp.get_loss("train"))
