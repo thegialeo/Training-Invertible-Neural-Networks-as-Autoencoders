@@ -1,5 +1,8 @@
 """Run experiments in the paper.
 
+Functions:
+    experiment_wrapper(list) -> tuple: wrapper for running bottleneck experiments
+
 Classes:
     Experiment: Run experiments in the paper
 """
@@ -133,3 +136,28 @@ class Experiment:
             self.bottleneck_loss["test"][idx] = test_loss
 
             trainer.plot_classic(self.testloader, 100, 10, save_path)
+
+
+def experiment_wrapper(model_lst: list[str]) -> tuple[list, list, list]:
+    """Run experiment wrapper.
+
+    Args:
+        model_lst: list of model names to run bottleneck experiment
+
+    Returns:
+        lat_dim_lst (list): bottleneck sizes used for each experiment
+        train_loss_lst (list): trainset reconstruction loss
+        test_loss_lst (list): testset reconstruction loss
+    """
+    lat_dim_lst = []
+    train_loss_lst = []
+    test_loss_lst = []
+
+    for modelname in model_lst:
+        exp = Experiment(modelname)
+        exp.run_experiment()
+        lat_dim_lst.append(exp.get_lat_dim_lst())
+        train_loss_lst.append(exp.get_loss("train"))
+        test_loss_lst.append(exp.get_loss("test"))
+
+    return lat_dim_lst, train_loss_lst, test_loss_lst
