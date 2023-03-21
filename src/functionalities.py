@@ -146,7 +146,7 @@ def plot_image(img: torch.Tensor, filename: str, folder: str = "") -> None:
 
 
 def plot_curves(
-    xdata: list[Union[int, float]],
+    xdata: list[list[Union[int, float]]],
     ydata: list[torch.Tensor],
     filename: str,
     plot_setting: dict,
@@ -165,8 +165,8 @@ def plot_curves(
 
     fig, axes = plt.subplots(1, 1, figsize=(15, 10))
 
-    for idx, y_curve in enumerate(ydata):
-        axes.plot(xdata, y_curve, label=plot_setting["names"][idx])
+    for idx, (x_values, y_values) in enumerate(zip(xdata, ydata)):
+        axes.plot(x_values, y_values, label=plot_setting["names"][idx])
 
     axes.set_xlabel(plot_setting["x_label"])
     axes.set_ylabel(plot_setting["y_label"])

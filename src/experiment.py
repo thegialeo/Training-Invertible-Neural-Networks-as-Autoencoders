@@ -4,7 +4,7 @@ Classes:
     Experiment: Run experiments in the paper
 """
 import os
-from typing import Union, cast
+from typing import cast
 
 import torch
 
@@ -39,15 +39,15 @@ class Experiment:
         """
         self.modelname = modelname
         self.subdir = subdir
-        self.hyp_dict: dict[Union[list[int], str]] = HYPERPARAMETER[modelname]
+        self.hyp_dict = HYPERPARAMETER[modelname]
         self.bottleneck_loss = {
             "train": torch.zeros(
-                len(self.hyp_dict["lat_dim_lst"]),
-                dtype=self.hyp_dict["dtype"],
+                len(cast(list, self.hyp_dict["lat_dim_lst"])),
+                dtype=cast(torch.dtype, self.hyp_dict["dtype"]),
             ),
             "test": torch.zeros(
-                len(self.hyp_dict["lat_dim_lst"]),
-                dtype=self.hyp_dict["dtype"],
+                len(cast(list, self.hyp_dict["lat_dim_lst"])),
+                dtype=cast(torch.dtype, self.hyp_dict["dtype"]),
             ),
         }
 
@@ -66,6 +66,15 @@ class Experiment:
             bottleneck_loss (dict): train and test loss for different bottleneck sizes
         """
         return self.bottleneck_loss
+
+    def get_lat_dim_lst(self) -> list:
+        """Return list of bottleneck dimensions used in the experiments.
+
+        Returns:
+            lat_dim_lst (list): list of bottleneck dimensions used in the experiments
+        """
+        lat_dim_lst = cast(list, self.hyp_dict["lat_dim_lst"])
+        return lat_dim_lst
 
     def run_inn_experiment(self) -> None:
         """Run INN autoencoder bottleneck experiment."""

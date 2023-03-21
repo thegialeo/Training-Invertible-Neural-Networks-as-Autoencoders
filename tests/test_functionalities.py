@@ -161,7 +161,7 @@ def test_plot_curves():
         "title": "Sine and Cosine Functions",
     }
 
-    plot_curves(x, [y_sin, y_cos], "test", plot_settings, "pytest")
+    plot_curves([x, x], [y_sin, y_cos], "test", plot_settings, "pytest")
 
     assert os.path.exists(os.path.join("plots", "pytest", "test.png"))
     delete_file("plots", "test.png", "pytest")

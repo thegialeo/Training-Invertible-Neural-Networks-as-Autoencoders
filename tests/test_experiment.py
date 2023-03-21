@@ -22,10 +22,13 @@ def test_experiment_inn(modelname):
         torch.utils.data.Subset(testset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, False
     )
     experiment.run_inn_experiment()
+    lat_dim_lst = experiment.get_lat_dim_lst()
     loss = experiment.get_loss()
+    assert isinstance(lat_dim_lst, list)
     assert isinstance(loss, dict)
     assert isinstance(loss["train"], torch.Tensor)
     assert isinstance(loss["test"], torch.Tensor)
+    assert lat_dim_lst == [3, 5]
     assert torch.equal(loss["train"], experiment.bottleneck_loss["train"])
     assert torch.equal(loss["test"], experiment.bottleneck_loss["test"])
     assert torch.sum(loss["train"] > 0) == 2
@@ -243,10 +246,13 @@ def test_experiment_classic(modelname):
         torch.utils.data.Subset(testset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, False
     )
     experiment.run_classic_experiment()
+    lat_dim_lst = experiment.get_lat_dim_lst()
     loss = experiment.get_loss()
+    assert isinstance(lat_dim_lst, list)
     assert isinstance(loss, dict)
     assert isinstance(loss["train"], torch.Tensor)
     assert isinstance(loss["test"], torch.Tensor)
+    assert lat_dim_lst == [3, 5]
     assert torch.equal(loss["train"], experiment.bottleneck_loss["train"])
     assert torch.equal(loss["test"], experiment.bottleneck_loss["test"])
     assert torch.sum(loss["train"] > 0) == 2
