@@ -59,13 +59,16 @@ class Experiment:
             testset, cast(int, self.hyp_dict["batch_size"]), False
         )
 
-    def get_loss(self) -> dict:
+    def get_loss(self, key: str) -> torch.Tensor:
         """Return train and test loss for all bottleneck sizes.
 
+        Args:
+            key (str): dictionary key. Options: 'train' and 'test'
+
         Returns:
-            bottleneck_loss (dict): train and test loss for different bottleneck sizes
+            bottleneck_loss (torch.Tensor): train and test loss for different bottleneck sizes
         """
-        return self.bottleneck_loss
+        return self.bottleneck_loss[key]
 
     def get_lat_dim_lst(self) -> list:
         """Return list of bottleneck dimensions used in the experiments.
@@ -75,6 +78,13 @@ class Experiment:
         """
         lat_dim_lst = cast(list, self.hyp_dict["lat_dim_lst"])
         return lat_dim_lst
+
+    def run_experiment(self) -> None:
+        """Run classic or INN autoencoder bottleneck experiment."""
+        if self.hyp_dict["INN"]:
+            self.run_inn_experiment()
+        else:
+            self.run_classic_experiment()
 
     def run_inn_experiment(self) -> None:
         """Run INN autoencoder bottleneck experiment."""

@@ -21,20 +21,20 @@ def test_experiment_inn(modelname):
     experiment.testloader = get_loader(
         torch.utils.data.Subset(testset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, False
     )
-    experiment.run_inn_experiment()
+    experiment.run_experiment()
     lat_dim_lst = experiment.get_lat_dim_lst()
-    loss = experiment.get_loss()
+    train_loss = experiment.get_loss("train")
+    test_loss = experiment.get_loss("test")
     assert isinstance(lat_dim_lst, list)
-    assert isinstance(loss, dict)
-    assert isinstance(loss["train"], torch.Tensor)
-    assert isinstance(loss["test"], torch.Tensor)
+    assert isinstance(train_loss, torch.Tensor)
+    assert isinstance(test_loss, torch.Tensor)
     assert lat_dim_lst == [3, 5]
-    assert torch.equal(loss["train"], experiment.bottleneck_loss["train"])
-    assert torch.equal(loss["test"], experiment.bottleneck_loss["test"])
-    assert torch.sum(loss["train"] > 0) == 2
-    assert loss["train"][0] != loss["train"][1]
-    assert torch.sum(loss["test"] > 0) == 2
-    assert loss["test"][0] != loss["test"][1]
+    assert torch.equal(train_loss, experiment.bottleneck_loss["train"])
+    assert torch.equal(test_loss, experiment.bottleneck_loss["test"])
+    assert torch.sum(train_loss > 0) == 2
+    assert train_loss[0] != train_loss[1]
+    assert torch.sum(test_loss > 0) == 2
+    assert test_loss[0] != test_loss[1]
     assert os.path.exists(
         os.path.join("models", "pytest", "lat_dim_3", f"{modelname}.pt")
     )
@@ -245,20 +245,20 @@ def test_experiment_classic(modelname):
     experiment.testloader = get_loader(
         torch.utils.data.Subset(testset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, False
     )
-    experiment.run_classic_experiment()
+    experiment.run_experiment()
     lat_dim_lst = experiment.get_lat_dim_lst()
-    loss = experiment.get_loss()
+    train_loss = experiment.get_loss("train")
+    test_loss = experiment.get_loss("test")
     assert isinstance(lat_dim_lst, list)
-    assert isinstance(loss, dict)
-    assert isinstance(loss["train"], torch.Tensor)
-    assert isinstance(loss["test"], torch.Tensor)
+    assert isinstance(train_loss, torch.Tensor)
+    assert isinstance(test_loss, torch.Tensor)
     assert lat_dim_lst == [3, 5]
-    assert torch.equal(loss["train"], experiment.bottleneck_loss["train"])
-    assert torch.equal(loss["test"], experiment.bottleneck_loss["test"])
-    assert torch.sum(loss["train"] > 0) == 2
-    assert loss["train"][0] != loss["train"][1]
-    assert torch.sum(loss["test"] > 0) == 2
-    assert loss["test"][0] != loss["test"][1]
+    assert torch.equal(train_loss, experiment.bottleneck_loss["train"])
+    assert torch.equal(test_loss, experiment.bottleneck_loss["test"])
+    assert torch.sum(train_loss > 0) == 2
+    assert train_loss[0] != train_loss[1]
+    assert torch.sum(test_loss > 0) == 2
+    assert test_loss[0] != test_loss[1]
     assert os.path.exists(
         os.path.join("models", "pytest", "lat_dim_3", f"{modelname}.pt")
     )
