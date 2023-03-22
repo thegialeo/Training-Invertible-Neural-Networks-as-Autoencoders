@@ -3,7 +3,6 @@ import os
 import pytest
 import torch
 
-from src.dataloader import DATASET, get_loader
 from src.experiment import Experiment, experiment_wrapper
 from src.filemanager import delete_file
 
@@ -23,9 +22,10 @@ def test_experiment_inn(modelname):
     assert lat_dim_lst == [3, 5]
     assert torch.equal(train_loss, experiment.bottleneck_loss["train"])
     assert torch.equal(test_loss, experiment.bottleneck_loss["test"])
-    assert torch.sum(train_loss > 0) == 2
+    assert train_loss.size() == (2,)
     assert train_loss[0] != train_loss[1]
-    assert torch.sum(test_loss > 0) == 2
+    assert test_loss.size() == (2,)
+    assert test_loss[0] != test_loss[1]
     assert os.path.exists(
         os.path.join("models", "pytest", "lat_dim_3", f"{modelname}.pt")
     )
@@ -186,18 +186,12 @@ def test_experiment_inn(modelname):
     assert os.path.exists(os.path.join("logs", "pytest", "lat_dim_5"))
     assert os.path.exists(os.path.join("plots", "pytest", "lat_dim_3"))
     assert os.path.exists(os.path.join("plots", "pytest", "lat_dim_5"))
-    if not os.listdir(os.path.join("models", "pytest", "lat_dim_3")):
-        os.rmdir(os.path.join("models", "pytest", "lat_dim_3"))
-    if not os.listdir(os.path.join("models", "pytest", "lat_dim_5")):
-        os.rmdir(os.path.join("models", "pytest", "lat_dim_5"))
-    if not os.listdir(os.path.join("logs", "pytest", "lat_dim_3")):
-        os.rmdir(os.path.join("logs", "pytest", "lat_dim_3"))
-    if not os.listdir(os.path.join("logs", "pytest", "lat_dim_5")):
-        os.rmdir(os.path.join("logs", "pytest", "lat_dim_5"))
-    if not os.listdir(os.path.join("plots", "pytest", "lat_dim_3")):
-        os.rmdir(os.path.join("plots", "pytest", "lat_dim_3"))
-    if not os.listdir(os.path.join("plots", "pytest", "lat_dim_5")):
-        os.rmdir(os.path.join("plots", "pytest", "lat_dim_5"))
+    os.rmdir(os.path.join("models", "pytest", "lat_dim_3"))
+    os.rmdir(os.path.join("models", "pytest", "lat_dim_5"))
+    os.rmdir(os.path.join("logs", "pytest", "lat_dim_3"))
+    os.rmdir(os.path.join("logs", "pytest", "lat_dim_5"))
+    os.rmdir(os.path.join("plots", "pytest", "lat_dim_3"))
+    os.rmdir(os.path.join("plots", "pytest", "lat_dim_5"))
     assert not os.path.exists(os.path.join("models", "pytest", "lat_dim_3"))
     assert not os.path.exists(os.path.join("models", "pytest", "lat_dim_5"))
     assert not os.path.exists(os.path.join("logs", "pytest", "lat_dim_3"))
@@ -207,15 +201,15 @@ def test_experiment_inn(modelname):
     assert os.path.exists(os.path.join("models", "pytest"))
     assert os.path.exists(os.path.join("logs", "pytest"))
     assert os.path.exists(os.path.join("plots", "pytest"))
-    if not os.listdir(os.path.join("models", "pytest")):
-        os.rmdir(os.path.join("models", "pytest"))
-    if not os.listdir(os.path.join("logs", "pytest")):
-        os.rmdir(os.path.join("logs", "pytest"))
-    if not os.listdir(os.path.join("plots", "pytest")):
-        os.rmdir(os.path.join("plots", "pytest"))
+    os.rmdir(os.path.join("models", "pytest"))
+    os.rmdir(os.path.join("logs", "pytest"))
+    os.rmdir(os.path.join("plots", "pytest"))
     assert not os.path.exists(os.path.join("models", "pytest"))
     assert not os.path.exists(os.path.join("logs", "pytest"))
     assert not os.path.exists(os.path.join("plots", "pytest"))
+    assert os.path.exists("models")
+    assert os.path.exists("logs")
+    assert os.path.exists("plots")
     if not os.listdir("models"):
         os.rmdir(os.path.join("models"))
         assert not os.path.exists(os.path.join("models"))
@@ -240,16 +234,6 @@ def test_experiment_inn(modelname):
 )
 def test_experiment_classic(modelname):
     experiment = Experiment(modelname, "pytest")
-    experiment.hyp_dict["num_epoch"] = 3
-    experiment.hyp_dict["milestones"] = [2]
-    experiment.hyp_dict["lat_dim_lst"] = [3, 5]
-    trainset, testset = DATASET[modelname]
-    experiment.trainloader = get_loader(
-        torch.utils.data.Subset(trainset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, True
-    )
-    experiment.testloader = get_loader(
-        torch.utils.data.Subset(testset, [1, 2, 3, 4, 5, 6, 7, 8]), 4, False
-    )
     experiment.run_experiment()
     lat_dim_lst = experiment.get_lat_dim_lst()
     train_loss = experiment.get_loss("train")
@@ -260,9 +244,9 @@ def test_experiment_classic(modelname):
     assert lat_dim_lst == [3, 5]
     assert torch.equal(train_loss, experiment.bottleneck_loss["train"])
     assert torch.equal(test_loss, experiment.bottleneck_loss["test"])
-    assert torch.sum(train_loss > 0) == 2
+    assert train_loss.size() == (2,)
     assert train_loss[0] != train_loss[1]
-    assert torch.sum(test_loss > 0) == 2
+    assert test_loss.size() == (2,)
     assert test_loss[0] != test_loss[1]
     assert os.path.exists(
         os.path.join("models", "pytest", "lat_dim_3", f"{modelname}.pt")
@@ -370,18 +354,12 @@ def test_experiment_classic(modelname):
     assert os.path.exists(os.path.join("logs", "pytest", "lat_dim_5"))
     assert os.path.exists(os.path.join("plots", "pytest", "lat_dim_3"))
     assert os.path.exists(os.path.join("plots", "pytest", "lat_dim_5"))
-    if not os.listdir(os.path.join("models", "pytest", "lat_dim_3")):
-        os.rmdir(os.path.join("models", "pytest", "lat_dim_3"))
-    if not os.listdir(os.path.join("models", "pytest", "lat_dim_5")):
-        os.rmdir(os.path.join("models", "pytest", "lat_dim_5"))
-    if not os.listdir(os.path.join("logs", "pytest", "lat_dim_3")):
-        os.rmdir(os.path.join("logs", "pytest", "lat_dim_3"))
-    if not os.listdir(os.path.join("logs", "pytest", "lat_dim_5")):
-        os.rmdir(os.path.join("logs", "pytest", "lat_dim_5"))
-    if not os.listdir(os.path.join("plots", "pytest", "lat_dim_3")):
-        os.rmdir(os.path.join("plots", "pytest", "lat_dim_3"))
-    if not os.listdir(os.path.join("plots", "pytest", "lat_dim_5")):
-        os.rmdir(os.path.join("plots", "pytest", "lat_dim_5"))
+    os.rmdir(os.path.join("models", "pytest", "lat_dim_3"))
+    os.rmdir(os.path.join("models", "pytest", "lat_dim_5"))
+    os.rmdir(os.path.join("logs", "pytest", "lat_dim_3"))
+    os.rmdir(os.path.join("logs", "pytest", "lat_dim_5"))
+    os.rmdir(os.path.join("plots", "pytest", "lat_dim_3"))
+    os.rmdir(os.path.join("plots", "pytest", "lat_dim_5"))
     assert not os.path.exists(os.path.join("models", "pytest", "lat_dim_3"))
     assert not os.path.exists(os.path.join("models", "pytest", "lat_dim_5"))
     assert not os.path.exists(os.path.join("logs", "pytest", "lat_dim_3"))
@@ -391,15 +369,15 @@ def test_experiment_classic(modelname):
     assert os.path.exists(os.path.join("models", "pytest"))
     assert os.path.exists(os.path.join("logs", "pytest"))
     assert os.path.exists(os.path.join("plots", "pytest"))
-    if not os.listdir(os.path.join("models", "pytest")):
-        os.rmdir(os.path.join("models", "pytest"))
-    if not os.listdir(os.path.join("logs", "pytest")):
-        os.rmdir(os.path.join("logs", "pytest"))
-    if not os.listdir(os.path.join("plots", "pytest")):
-        os.rmdir(os.path.join("plots", "pytest"))
+    os.rmdir(os.path.join("models", "pytest"))
+    os.rmdir(os.path.join("logs", "pytest"))
+    os.rmdir(os.path.join("plots", "pytest"))
     assert not os.path.exists(os.path.join("models", "pytest"))
     assert not os.path.exists(os.path.join("logs", "pytest"))
     assert not os.path.exists(os.path.join("plots", "pytest"))
+    assert os.path.exists("models")
+    assert os.path.exists("logs")
+    assert os.path.exists("plots")
     if not os.listdir("models"):
         os.rmdir(os.path.join("models"))
         assert not os.path.exists(os.path.join("models"))
@@ -435,6 +413,21 @@ def test_experiment_wrapper():
     for train_loss, test_loss in zip(train_loss_lst, test_loss_lst):
         assert isinstance(train_loss, torch.Tensor)
         assert isinstance(test_loss, torch.Tensor)
+        assert train_loss.size() == (2,)
+        assert train_loss[0] != train_loss[1]
+        assert test_loss.size() == (2,)
+        assert test_loss[0] != test_loss[1]
+
+    assert os.path.exists(os.path.join("plots", "pytest", "train_bottleneck_loss.png"))
+    assert os.path.exists(os.path.join("plots", "pytest", "test_bottleneck_loss.png"))
+    delete_file("plots", "train_bottleneck_loss.png", "pytest")
+    delete_file("plots", "test_bottleneck_loss.png", "pytest")
+    assert not os.path.exists(
+        os.path.join("plots", "pytest", "train_bottleneck_loss.png")
+    )
+    assert not os.path.exists(
+        os.path.join("plots", "pytest", "test_bottleneck_loss.png")
+    )
 
     for inn_modelname in model_lst[:3]:
         assert os.path.exists(
@@ -648,18 +641,12 @@ def test_experiment_wrapper():
     assert os.path.exists(os.path.join("logs", "pytest", "lat_dim_5"))
     assert os.path.exists(os.path.join("plots", "pytest", "lat_dim_3"))
     assert os.path.exists(os.path.join("plots", "pytest", "lat_dim_5"))
-    if not os.listdir(os.path.join("models", "pytest", "lat_dim_3")):
-        os.rmdir(os.path.join("models", "pytest", "lat_dim_3"))
-    if not os.listdir(os.path.join("models", "pytest", "lat_dim_5")):
-        os.rmdir(os.path.join("models", "pytest", "lat_dim_5"))
-    if not os.listdir(os.path.join("logs", "pytest", "lat_dim_3")):
-        os.rmdir(os.path.join("logs", "pytest", "lat_dim_3"))
-    if not os.listdir(os.path.join("logs", "pytest", "lat_dim_5")):
-        os.rmdir(os.path.join("logs", "pytest", "lat_dim_5"))
-    if not os.listdir(os.path.join("plots", "pytest", "lat_dim_3")):
-        os.rmdir(os.path.join("plots", "pytest", "lat_dim_3"))
-    if not os.listdir(os.path.join("plots", "pytest", "lat_dim_5")):
-        os.rmdir(os.path.join("plots", "pytest", "lat_dim_5"))
+    os.rmdir(os.path.join("models", "pytest", "lat_dim_3"))
+    os.rmdir(os.path.join("models", "pytest", "lat_dim_5"))
+    os.rmdir(os.path.join("logs", "pytest", "lat_dim_3"))
+    os.rmdir(os.path.join("logs", "pytest", "lat_dim_5"))
+    os.rmdir(os.path.join("plots", "pytest", "lat_dim_3"))
+    os.rmdir(os.path.join("plots", "pytest", "lat_dim_5"))
     assert not os.path.exists(os.path.join("models", "pytest", "lat_dim_3"))
     assert not os.path.exists(os.path.join("models", "pytest", "lat_dim_5"))
     assert not os.path.exists(os.path.join("logs", "pytest", "lat_dim_3"))
@@ -669,15 +656,15 @@ def test_experiment_wrapper():
     assert os.path.exists(os.path.join("models", "pytest"))
     assert os.path.exists(os.path.join("logs", "pytest"))
     assert os.path.exists(os.path.join("plots", "pytest"))
-    if not os.listdir(os.path.join("models", "pytest")):
-        os.rmdir(os.path.join("models", "pytest"))
-    if not os.listdir(os.path.join("logs", "pytest")):
-        os.rmdir(os.path.join("logs", "pytest"))
-    if not os.listdir(os.path.join("plots", "pytest")):
-        os.rmdir(os.path.join("plots", "pytest"))
+    os.rmdir(os.path.join("models", "pytest"))
+    os.rmdir(os.path.join("logs", "pytest"))
+    os.rmdir(os.path.join("plots", "pytest"))
     assert not os.path.exists(os.path.join("models", "pytest"))
     assert not os.path.exists(os.path.join("logs", "pytest"))
     assert not os.path.exists(os.path.join("plots", "pytest"))
+    assert os.path.exists("models")
+    assert os.path.exists("logs")
+    assert os.path.exists("plots")
     if not os.listdir("models"):
         os.rmdir(os.path.join("models"))
         assert not os.path.exists(os.path.join("models"))

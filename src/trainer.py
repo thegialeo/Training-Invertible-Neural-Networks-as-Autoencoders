@@ -63,8 +63,6 @@ class Trainer:
             trainloader (torch.utils.data.DataLoader): dataloader for training.
             subdir (str): subdirectory to save the model. Defaults to "".
         """
-        print(f"Start training for latent dimension: {self.lat_dim}")
-
         self.model.to(self.hyp_dict["device"])
         self.model.train()
 
@@ -109,11 +107,12 @@ class Trainer:
                 + f"L_dist: {losses[2].cpu().detach():.3f} \t"
                 + f"L_spar: {losses[3].cpu().detach():.3f}"
             )
-            print("\n")
-            print("-" * 80)
-            print("\n")
 
+        print("\n")
         print("Finished training")
+        print("\n")
+        print("-" * 80)
+        print("\n")
 
         self.model.to("cpu")
         save_model(self.model, f"{self.modelname}", subdir)
@@ -178,11 +177,12 @@ class Trainer:
             self.tracker.update_classic_loss(losses, epoch, mode="train")
 
             print(f"Loss: {losses[0].cpu().detach():.3f}")
-            print("\n")
-            print("-" * 80)
-            print("\n")
 
+        print("\n")
         print("Finished training")
+        print("\n")
+        print("-" * 80)
+        print("\n")
 
         self.model.to("cpu")
         save_model(self.model, f"{self.modelname}", subdir)

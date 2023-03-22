@@ -13,6 +13,7 @@ import torch
 
 from src.dataloader import DATASET, get_loader
 from src.filemanager import save_numpy
+from src.functionalities import plot_curves
 from src.settings import HYPERPARAMETER
 from src.trainer import Trainer
 
@@ -163,7 +164,7 @@ class Experiment:
 def experiment_wrapper(
     model_lst: list[str], subdir: str = ""
 ) -> tuple[list, list, list]:
-    """Run experiment wrapper.
+    """Run bottleneck experiment and plotting results.
 
     Args:
         model_lst: list of model names to run bottleneck experiment
@@ -184,5 +185,19 @@ def experiment_wrapper(
         lat_dim_lst.append(exp.get_lat_dim_lst())
         train_loss_lst.append(exp.get_loss("train"))
         test_loss_lst.append(exp.get_loss("test"))
+
+    plot_settings = {
+        "names": model_lst,
+        "x_label": "bottleneck size",
+        "y_label": "reconstruction loss",
+        "title": None,
+    }
+
+    plot_curves(
+        lat_dim_lst, train_loss_lst, "train_bottleneck_loss", plot_settings, subdir
+    )
+    plot_curves(
+        lat_dim_lst, test_loss_lst, "test_bottleneck_loss", plot_settings, subdir
+    )
 
     return lat_dim_lst, train_loss_lst, test_loss_lst
