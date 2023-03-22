@@ -31,6 +31,8 @@ def test_experiment_inn(modelname):
     assert test_loss.size() == (2,)
     assert test_loss[0] != test_loss[1]
     assert len(num_params) == 2
+    assert num_params[0] > 0
+    assert num_params[1] > 0
     assert num_params[0] == num_params[1]
     assert os.path.exists(
         os.path.join("models", "pytest", "lat_dim_3", f"{modelname}.pt")
@@ -259,6 +261,8 @@ def test_experiment_classic(modelname):
     assert test_loss.size() == (2,)
     assert test_loss[0] != test_loss[1]
     assert len(num_params) == 2
+    assert num_params[0] > 0
+    assert num_params[1] > 0
     assert num_params[0] < num_params[1]
     assert os.path.exists(
         os.path.join("models", "pytest", "lat_dim_3", f"{modelname}.pt")
@@ -413,15 +417,19 @@ def test_experiment_wrapper():
         "pytest_cifar_classic",
         "pytest_celeba_classic",
     ]
-    lat_dim_lst, train_loss_lst, test_loss_lst = experiment_wrapper(model_lst, "pytest")
+    lat_dim_lst, train_loss_lst, test_loss_lst, num_param_lst = experiment_wrapper(
+        model_lst, "pytest"
+    )
     assert isinstance(lat_dim_lst, list)
     assert isinstance(train_loss_lst, list)
     assert isinstance(test_loss_lst, list)
+    assert isinstance(num_param_lst, list)
     assert len(lat_dim_lst) == len(model_lst)
     assert len(train_loss_lst) == len(model_lst)
     assert len(test_loss_lst) == len(model_lst)
-    for item in lat_dim_lst:
-        assert item == [3, 5]
+    assert len(num_param_lst) == len(model_lst)
+    for lat_dim in lat_dim_lst:
+        assert lat_dim == [3, 5]
     for train_loss, test_loss in zip(train_loss_lst, test_loss_lst):
         assert isinstance(train_loss, torch.Tensor)
         assert isinstance(test_loss, torch.Tensor)
@@ -429,6 +437,13 @@ def test_experiment_wrapper():
         assert train_loss[0] != train_loss[1]
         assert test_loss.size() == (2,)
         assert test_loss[0] != test_loss[1]
+    for num_param in num_param_lst:
+        assert isinstance(num_param, list)
+        assert isinstance(num_param[0], int)
+        assert isinstance(num_param[1], int)
+        assert num_param[0] > 0
+        assert num_param[1] > 0
+        assert num_param[0] <= num_param[1]
 
     assert os.path.exists(os.path.join("plots", "pytest", "train_bottleneck_loss.png"))
     assert os.path.exists(os.path.join("plots", "pytest", "test_bottleneck_loss.png"))

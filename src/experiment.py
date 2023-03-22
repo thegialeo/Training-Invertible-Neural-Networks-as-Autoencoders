@@ -174,7 +174,7 @@ class Experiment:
 
 def experiment_wrapper(
     model_lst: list[str], subdir: str = ""
-) -> tuple[list, list, list]:
+) -> tuple[list, list, list, list]:
     """Run bottleneck experiment and plotting results.
 
     Args:
@@ -189,6 +189,7 @@ def experiment_wrapper(
     lat_dim_lst = []
     train_loss_lst = []
     test_loss_lst = []
+    num_param_lst = []
 
     for modelname in model_lst:
         exp = Experiment(modelname, subdir)
@@ -196,6 +197,7 @@ def experiment_wrapper(
         lat_dim_lst.append(exp.get_lat_dim_lst())
         train_loss_lst.append(exp.get_loss("train"))
         test_loss_lst.append(exp.get_loss("test"))
+        num_param_lst.append(exp.get_model_param_count())
 
     plot_settings = {
         "names": model_lst,
@@ -211,4 +213,4 @@ def experiment_wrapper(
         lat_dim_lst, test_loss_lst, "test_bottleneck_loss", plot_settings, subdir
     )
 
-    return lat_dim_lst, train_loss_lst, test_loss_lst
+    return lat_dim_lst, train_loss_lst, test_loss_lst, num_param_lst
