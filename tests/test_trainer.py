@@ -29,12 +29,15 @@ def test_trainer_inn(modelname):
     end_loss = trainer.evaluate_inn(trainloader)
     trainer.plot_inn(trainloader, 4, 2)
     trainer.plot_inn(trainloader, 4, 2, "pytest")
+    num_params = trainer.count_model_param()
     assert isinstance(start_loss, float)
     assert isinstance(end_loss, float)
+    assert isinstance(num_params, int)
     assert start_loss >= 0
     assert end_loss >= 0
     assert start_loss != end_loss
     assert start_model.parameters() != end_model.parameters()
+    assert num_params > 0
     assert os.path.exists(os.path.join("models", "pytest", f"{modelname}.pt"))
     assert os.path.exists(
         os.path.join("logs", "pytest", f"{modelname}_train_total.npy")
@@ -140,12 +143,15 @@ def test_trainer_classic(modelname):
     end_loss = trainer.evaluate_classic(trainloader)
     trainer.plot_classic(trainloader, 4, 2)
     trainer.plot_classic(trainloader, 4, 2, "pytest")
+    num_params = trainer.count_model_param()
     assert isinstance(start_loss, float)
     assert isinstance(end_loss, float)
+    assert isinstance(num_params, int)
     assert start_loss >= 0
     assert end_loss >= 0
     assert start_loss != end_loss
     assert start_model.parameters() != end_model.parameters()
+    assert num_params > 0
     assert os.path.exists(os.path.join("models", "pytest", f"{modelname}.pt"))
     assert os.path.exists(os.path.join("logs", "pytest", f"{modelname}_train_rec.npy"))
     assert os.path.exists(os.path.join("plots", f"{modelname}_original.png"))

@@ -16,9 +16,13 @@ def test_experiment_inn(modelname):
     lat_dim_lst = experiment.get_lat_dim_lst()
     train_loss = experiment.get_loss("train")
     test_loss = experiment.get_loss("test")
+    num_params = experiment.get_model_param_count()
     assert isinstance(lat_dim_lst, list)
     assert isinstance(train_loss, torch.Tensor)
     assert isinstance(test_loss, torch.Tensor)
+    assert isinstance(num_params, list)
+    assert isinstance(num_params[0], int)
+    assert isinstance(num_params[1], int)
     assert lat_dim_lst == [3, 5]
     assert torch.equal(train_loss, experiment.bottleneck_loss["train"])
     assert torch.equal(test_loss, experiment.bottleneck_loss["test"])
@@ -26,6 +30,8 @@ def test_experiment_inn(modelname):
     assert train_loss[0] != train_loss[1]
     assert test_loss.size() == (2,)
     assert test_loss[0] != test_loss[1]
+    assert len(num_params) == 2
+    assert num_params[0] == num_params[1]
     assert os.path.exists(
         os.path.join("models", "pytest", "lat_dim_3", f"{modelname}.pt")
     )
@@ -238,9 +244,13 @@ def test_experiment_classic(modelname):
     lat_dim_lst = experiment.get_lat_dim_lst()
     train_loss = experiment.get_loss("train")
     test_loss = experiment.get_loss("test")
+    num_params = experiment.get_model_param_count()
     assert isinstance(lat_dim_lst, list)
     assert isinstance(train_loss, torch.Tensor)
     assert isinstance(test_loss, torch.Tensor)
+    assert isinstance(num_params, list)
+    assert isinstance(num_params[0], int)
+    assert isinstance(num_params[1], int)
     assert lat_dim_lst == [3, 5]
     assert torch.equal(train_loss, experiment.bottleneck_loss["train"])
     assert torch.equal(test_loss, experiment.bottleneck_loss["test"])
@@ -248,6 +258,8 @@ def test_experiment_classic(modelname):
     assert train_loss[0] != train_loss[1]
     assert test_loss.size() == (2,)
     assert test_loss[0] != test_loss[1]
+    assert len(num_params) == 2
+    assert num_params[0] < num_params[1]
     assert os.path.exists(
         os.path.join("models", "pytest", "lat_dim_3", f"{modelname}.pt")
     )

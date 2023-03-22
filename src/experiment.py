@@ -55,6 +55,7 @@ class Experiment:
                 dtype=cast(torch.dtype, self.hyp_dict["dtype"]),
             ),
         }
+        self.model_param_count: list[int] = []
 
         trainset, testset = DATASET[self.modelname]
 
@@ -73,6 +74,15 @@ class Experiment:
             testset, cast(int, self.hyp_dict["batch_size"]), False
         )
 
+    def get_lat_dim_lst(self) -> list:
+        """Return list of bottleneck dimensions used in the experiments.
+
+        Returns:
+            lat_dim_lst (list): list of bottleneck dimensions used in the experiments
+        """
+        lat_dim_lst = cast(list, self.hyp_dict["lat_dim_lst"])
+        return lat_dim_lst
+
     def get_loss(self, mode: str) -> torch.Tensor:
         """Return train and test loss for all bottleneck sizes.
 
@@ -84,14 +94,13 @@ class Experiment:
         """
         return self.bottleneck_loss[mode]
 
-    def get_lat_dim_lst(self) -> list:
-        """Return list of bottleneck dimensions used in the experiments.
+    def get_model_param_count(self) -> list[int]:
+        """Return number of trainable parameters of autoencoder model.
 
         Returns:
-            lat_dim_lst (list): list of bottleneck dimensions used in the experiments
+            model_param_count (list): number of trainable parameters for each bottleneck size
         """
-        lat_dim_lst = cast(list, self.hyp_dict["lat_dim_lst"])
-        return lat_dim_lst
+        return self.model_param_count
 
     def run_experiment(self) -> None:
         """Run classic or INN autoencoder bottleneck experiment."""
@@ -132,6 +141,7 @@ class Experiment:
             test_loss = trainer.evaluate_inn(self.testloader)
             self.bottleneck_loss["train"][idx] = train_loss
             self.bottleneck_loss["test"][idx] = test_loss
+            self.model_param_count.append(trainer.count_model_param())
 
             trainer.plot_inn(self.testloader, 100, 10, save_path)
 
@@ -157,6 +167,7 @@ class Experiment:
             test_loss = trainer.evaluate_classic(self.testloader)
             self.bottleneck_loss["train"][idx] = train_loss
             self.bottleneck_loss["test"][idx] = test_loss
+            self.model_param_count.append(trainer.count_model_param())
 
             trainer.plot_classic(self.testloader, 100, 10, save_path)
 

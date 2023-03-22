@@ -10,7 +10,13 @@ import torchvision
 from tqdm.autonotebook import tqdm
 
 from src.filemanager import save_model, save_numpy
-from src.functionalities import get_device, get_model, get_optimizer, plot_image
+from src.functionalities import (
+    count_param,
+    get_device,
+    get_model,
+    get_optimizer,
+    plot_image,
+)
 from src.loss import LossTracker
 
 
@@ -355,3 +361,12 @@ class Trainer:
             f"{self.modelname}_difference",
             folder,
         )
+
+    def count_model_param(self) -> int:
+        """Count number of trainable parameters in the model.
+
+        Returns:
+            num_param (int): number of trainable parameters
+        """
+        num_param = count_param(self.model)
+        return num_param
