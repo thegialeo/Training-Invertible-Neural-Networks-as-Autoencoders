@@ -147,7 +147,7 @@ def plot_image(img: torch.Tensor, filename: str, folder: str = "") -> None:
 
 def plot_curves(
     xdata: list[list[Union[int, float]]],
-    ydata: list[torch.Tensor],
+    ydata: Union[list[torch.Tensor], list[list[int]]],
     filename: str,
     plot_setting: dict,
     folder: str = "",

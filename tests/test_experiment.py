@@ -447,13 +447,18 @@ def test_experiment_wrapper():
 
     assert os.path.exists(os.path.join("plots", "pytest", "train_bottleneck_loss.png"))
     assert os.path.exists(os.path.join("plots", "pytest", "test_bottleneck_loss.png"))
+    assert os.path.exists(os.path.join("plots", "pytest", "num_param_comparison.png"))
     delete_file("plots", "train_bottleneck_loss.png", "pytest")
     delete_file("plots", "test_bottleneck_loss.png", "pytest")
+    delete_file("plots", "num_param_comparison.png", "pytest")
     assert not os.path.exists(
         os.path.join("plots", "pytest", "train_bottleneck_loss.png")
     )
     assert not os.path.exists(
         os.path.join("plots", "pytest", "test_bottleneck_loss.png")
+    )
+    assert not os.path.exists(
+        os.path.join("plots", "pytest", "num_param_comparison.png")
     )
 
     for inn_modelname in model_lst[:3]:

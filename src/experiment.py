@@ -199,18 +199,40 @@ def experiment_wrapper(
         test_loss_lst.append(exp.get_loss("test"))
         num_param_lst.append(exp.get_model_param_count())
 
-    plot_settings = {
+    bottleneck_plot_settings = {
         "names": model_lst,
         "x_label": "bottleneck size",
         "y_label": "reconstruction loss",
         "title": None,
     }
 
+    num_param_plot_settings = {
+        "names": model_lst,
+        "x_label": "bottleneck size",
+        "y_label": "number of parameters",
+        "title": None,
+    }
+
     plot_curves(
-        lat_dim_lst, train_loss_lst, "train_bottleneck_loss", plot_settings, subdir
+        lat_dim_lst,
+        train_loss_lst,
+        "train_bottleneck_loss",
+        bottleneck_plot_settings,
+        subdir,
     )
     plot_curves(
-        lat_dim_lst, test_loss_lst, "test_bottleneck_loss", plot_settings, subdir
+        lat_dim_lst,
+        test_loss_lst,
+        "test_bottleneck_loss",
+        bottleneck_plot_settings,
+        subdir,
+    )
+    plot_curves(
+        lat_dim_lst,
+        num_param_lst,
+        "num_param_comparison",
+        num_param_plot_settings,
+        subdir,
     )
 
     return lat_dim_lst, train_loss_lst, test_loss_lst, num_param_lst

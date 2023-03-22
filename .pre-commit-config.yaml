@@ -132,6 +132,7 @@ repos:
         entry: poetry run pytest
         types: [python]
         pass_filenames: false
+        always_run: true
 
       - id: bandit
         name: bandit
@@ -155,3 +156,4 @@ repos:
         entry: poetry run pytest --cov=src --cov-report=html --cov-fail-under=100
         types: [python]
         pass_filenames: false
+        always_run: true
