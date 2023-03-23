@@ -7,7 +7,7 @@ Classes:
     Experiment: Run experiments in the paper
 """
 import os
-from typing import cast
+from typing import Union, cast
 
 import torch
 
@@ -22,17 +22,21 @@ class Experiment:
     """Class for running experiments.
 
     Attributes:
-        modelname: name of the model to run experiments
-        hyp_dict (dict): collection of hyperparameters
-        bottleneck_loss (dict): train and test loss for different bottleneck sizes
+        modelname (list): name of the model to run experiments
         subdir (str): subdirectory for saving experiment results
-        trainloader: dataloader for trainset
-        testloader: dataloader for testset
+        hyp_dict (dict): collection of hyperparameters
+        bottleneck_loss (dict): train and test loss for each bottleneck size
+        model_param_count (list):  number trainable parameters for each bottleneck size
+        trainloader (torch.DataLoader): dataloader for trainset
+        testloader (torch.DataLoader): dataloader for testset
 
     Methods:
+        get_lat_dim_lst () -> list: return bottleneck sizes used in the experiments
+        get_loss() -> dict: return train and test loss for all bottlenecks
+        get_model_param_count() -> list: number of model trainable parameters per bottleneck
+        run_experiment() -> None: run bottleneck experiment (entry point)
         run_inn_experiment() -> None: run bottleneck experiment for INN autoencoder
         run_classic_experiment() -> None: run bottleneck experiment for classic autoencoder
-        get_loss() -> dict: return train and test loss for all bottlenecks
     """
 
     def __init__(self, modelname: str, subdir: str = "") -> None:
@@ -173,19 +177,23 @@ class Experiment:
 
 
 def experiment_wrapper(
-    model_lst: list[str], subdir: str = ""
-) -> tuple[list, list, list, list]:
+    model_lst: list[str], subdir: str = "", skip_exec: bool = False
+) -> Union[tuple[list, list, list, list], int]:
     """Run bottleneck experiment and plotting results.
 
     Args:
         model_lst: list of model names to run bottleneck experiment
         subdir (str): subdirectory for saving experiment results. Defaults to "".
+        skip_exec (bool): don't run bottleneck experiment (for unit tests)
 
     Returns:
         lat_dim_lst (list): bottleneck sizes used for each experiment
         train_loss_lst (list): trainset reconstruction loss
         test_loss_lst (list): testset reconstruction loss
     """
+    if skip_exec:
+        return 0
+
     lat_dim_lst = []
     train_loss_lst = []
     test_loss_lst = []

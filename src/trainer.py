@@ -39,6 +39,7 @@ class Trainer:
         evaluate_classic(torch.Dataloader) -> float: evaluate classic autoencoder.
         plot_inn(torch.Dataloader, int, int, str) -> None: plot images for INN autoencoder.
         plot_classic(torch.Dataloader, int, int, str) -> None: plot images for classic autoencoder.
+        count_model_param() -> int: count the model trainable parameters
     """
 
     def __init__(self, lat_dim: int, modelname: str, hyp_dict: dict) -> None:

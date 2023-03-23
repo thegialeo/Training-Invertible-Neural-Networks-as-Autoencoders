@@ -706,3 +706,20 @@ def test_experiment_wrapper():
     if not os.listdir("plots"):
         os.rmdir(os.path.join("plots"))
         assert not os.path.exists(os.path.join("plots"))
+
+
+def test_experiment_wrapper_skip():
+    model_lst = [
+        "pytest_mnist_inn",
+        "pytest_cifar_inn",
+        "pytest_celeba_inn",
+        "pytest_mnist_classic",
+        "pytest_mnist_classic1024",
+        "pytest_mnist_classicDeep1024",
+        "pytest_mnist_classic2048",
+        "pytest_cifar_classic",
+        "pytest_celeba_classic",
+    ]
+    out = experiment_wrapper(model_lst, "pytest", skip_exec=True)
+    assert isinstance(out, int)
+    assert out == 0

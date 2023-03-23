@@ -441,6 +441,17 @@ files = [
 ]
 
 [[package]]
+name = "docopt"
+version = "0.6.2"
+description = "Pythonic argument parser, that will make you smile"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"},
+]
+
+[[package]]
 name = "dparse"
 version = "0.6.2"
 description = "A parser for Python dependency files"
@@ -1585,6 +1596,21 @@ files = [
 pbr = ">=2.0.0,<2.1.0 || >2.1.0"
 
 [[package]]
+name = "tabulate"
+version = "0.9.0"
+description = "Pretty-print tabular data"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tabulate-0.9.0-py3-none-any.whl", hash = "sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f"},
+    {file = "tabulate-0.9.0.tar.gz", hash = "sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c"},
+]
+
+[package.extras]
+widechars = ["wcwidth"]
+
+[[package]]
 name = "tokenize-rt"
 version = "5.0.0"
 description = "A wrapper around the stdlib `tokenize` which roundtrips."
@@ -1732,6 +1758,18 @@ dev = ["py-make (>=0.1.0)", "twine", "wheel"]
 notebook = ["ipywidgets (>=6)"]
 slack = ["slack-sdk"]
 telegram = ["requests"]
+
+[[package]]
+name = "types-tabulate"
+version = "0.9.0.1"
+description = "Typing stubs for tabulate"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-tabulate-0.9.0.1.tar.gz", hash = "sha256:e486292c279f19247865bdabe802419740a0e74b53444e7f7a8009e08129da5d"},
+    {file = "types_tabulate-0.9.0.1-py3-none-any.whl", hash = "sha256:be2ea0de05f615ccfcbadf6206aa720e265955eb1de23e343aec9d8bf3fa9aaa"},
+]
 
 [[package]]
 name = "typing-extensions"
@@ -1891,4 +1929,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "083b0c412d7670856e4711a28d076f27fb17c92bf87a73f9faa931f5147d2a27"
+content-hash = "735fcbd67a40536e3c6494a7be2d6f17c094da2e6e07086ef2f66b03457a1fe9"
